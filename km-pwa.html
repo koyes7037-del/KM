@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14532d">
+<meta name="description" content="KM Wholesale offline wholesale management app">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>KM Wholesale</title>
+<style>
+:root{--green:#14532d;--green2:#198754;--bg:#f3f6f4;--line:#dce5df;--ink:#17231b}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--green);color:white;padding:18px 16px;position:sticky;top:0;z-index:2}
+h1{font-size:24px;margin:0;font-weight:800;letter-spacing:.4px}header p{margin:4px 0 0;font-size:13px;opacity:.9}
+nav{display:flex;gap:8px;overflow:auto;padding:10px;background:white;border-bottom:1px solid var(--line);position:sticky;top:82px;z-index:2}
+nav button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 13px;font-weight:650;color:var(--green)}
+nav button.active{background:var(--green);color:#fff}
+main{padding:14px;max-width:850px;margin:auto}.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px;box-shadow:0 2px 8px #102c1b0a}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:#eef7f0;border-radius:12px;padding:13px}.stat small{display:block;color:#476452}.stat strong{font-size:22px}
+label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd8cf;border-radius:9px;font:inherit;background:white}
+button.primary{background:var(--green2);color:white;border:0;border-radius:10px;padding:11px 15px;font-weight:700;margin-top:12px}
+button.secondary{background:#edf4ef;color:var(--green);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-weight:650}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.muted{color:#65756a;font-size:12px}.item{padding:10px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:8px 5px;border-bottom:1px solid var(--line)}th{color:#506257}
+.total{font-size:20px;font-weight:800;color:var(--green)}.warning{background:#fff8e6;border:1px solid #f0dfa9;padding:10px;border-radius:10px;font-size:12px;line-height:1.5}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><h1>KM WHOLESALE</h1><p>Wholesale Management • Offline starter</p></header>
+<nav>
+<button class="active" data-tab="home">হোম</button><button data-tab="products">পণ্য</button><button data-tab="invoice">বিল তৈরি</button><button data-tab="history">বিলের তালিকা</button><button data-tab="settings">সেটিংস</button>
+</nav>
+<main>
+<section id="home" class="panel active">
+<div class="grid">
+<div class="stat"><small>মোট পণ্য</small><strong id="countProducts">0</strong></div>
+<div class="stat"><small>মোট বিল</small><strong id="countBills">0</strong></div>
+<div class="stat"><small>আজকের বিক্রি</small><strong id="todaySales">৳0</strong></div>
+<div class="stat"><small>সংরক্ষণ</small><strong>ডিভাইসে</strong></div>
+</div>
+<div class="card"><h2>স্বাগতম</h2><p>এটি KM Wholesale-এর প্রাথমিক অফলাইন সংস্করণ। পণ্য ও বিল এই ডিভাইসের ব্রাউজারে সংরক্ষিত থাকবে।</p><div class="warning">গুরুত্বপূর্ণ: এটি এখনো বহু মোবাইলের অনলাইন সিঙ্ক বা নিরাপদ কর্মচারী লগইন নয়। সেগুলোর জন্য সার্ভার ও নিরাপদ অ্যাকাউন্ট ব্যবস্থা পরে যুক্ত করতে হবে।</div></div>
+</section>
+<section id="products" class="panel">
+<div class="card"><h2>নতুন পণ্য যোগ করুন</h2>
+<label>পণ্যের নাম</label><input id="pname" placeholder="যেমন: চাল">
+<div class="row"><div><label>ক্রয়মূল্য</label><input id="pcost" type="number" min="0" placeholder="0"></div><div><label>বিক্রয়মূল্য</label><input id="psell" type="number" min="0" placeholder="0"></div></div>
+<div class="row"><div><label>পরিমাণ/স্টক</label><input id="pqty" type="number" min="0" placeholder="0"></div><div><label>একক</label><input id="punit" placeholder="কেজি/পিস"></div></div>
+<button class="primary" onclick="addProduct()">পণ্য সংরক্ষণ</button>
+</div><div class="card"><h2>পণ্যের তালিকা</h2><div id="productList" class="muted">এখনো কোনো পণ্য যোগ হয়নি।</div></div>
+</section>
+<section id="invoice" class="panel">
+<div class="card"><h2>নতুন বিল</h2>
+<label>ক্রেতার নাম (ঐচ্ছিক)</label><input id="customer" placeholder="ক্রেতার নাম">
+<label>বিল করছেন</label><select id="employee"><option>Admin</option><option>কর্মচারী ১</option><option>কর্মচারী ২</option><option>কর্মচারী ৩</option><option>কর্মচারী ৪</option><option>কর্মচারী ৫</option></select>
+<div class="row"><div><label>পণ্য</label><select id="billProduct"></select></div><div><label>পরিমাণ</label><input id="billQty" type="number" min="0.01" step="0.01" value="1"></div></div>
+<button class="secondary" onclick="addLine()">বিলে পণ্য যোগ</button>
+<div id="billLines" class="item muted">কোনো পণ্য যোগ হয়নি।</div>
+<label>শেষে অতিরিক্ত যোগ (৳)</label><input id="extra" type="number" min="0" value="0">
+<label>নোট (ঐচ্ছিক)</label><input id="billNote" placeholder="বিলের নোট">
+<p>সর্বমোট: <span class="total" id="grandTotal">৳0</span></p>
+<button class="primary" onclick="saveBill()">বিল সংরক্ষণ</button>
+</div>
+</section>
+<section id="history" class="panel"><div class="card"><h2>বিলের তালিকা</h2><div id="billList" class="muted">এখনো কোনো বিল নেই।</div></div></section>
+<section id="settings" class="panel">
+<div class="card"><h2>সেটিংস</h2><label>দোকানের নাম</label><input id="shopName" value="KM WHOLESALE"><button class="primary" onclick="saveSettings()">নাম সংরক্ষণ</button></div>
+<div class="card"><h3>ডেটা ব্যাকআপ</h3><p class="muted">এই ডিভাইসের তথ্য JSON ফাইলে নামিয়ে রাখতে পারবেন। অন্য ডিভাইসে স্বয়ংক্রিয়ভাবে যাবে না।</p><button class="secondary" onclick="backup()">ব্যাকআপ ডাউনলোড</button><label>ব্যাকআপ ফাইল থেকে ফিরিয়ে আনুন</label><input type="file" id="restoreFile" accept=".json,application/json"><button class="secondary" onclick="restore()">ব্যাকআপ ফিরিয়ে আনুন</button></div>
+<div class="card"><button class="secondary" onclick="clearData()">সব ডেটা মুছুন</button><p class="muted">এটি করলে এই ব্রাউজারের পণ্য ও বিল মুছে যাবে।</p></div>
+</section>
+</main>
+<script>
+const KEY='km_wholesale_starter_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"products":[],"bills":[],"shop":"KM WHOLESALE"}');
+let cart=[];
+const money=n=>'৳'+(Number(n)||0).toLocaleString('en-BD',{maximumFractionDigits:2});
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function tab(id){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+function addProduct(){let name=pname.value.trim(),cost=+pcost.value,sell=+psell.value,qty=+pqty.value,unit=punit.value.trim();if(!name||psell.value===''||pqty.value===''){alert('পণ্যের নাম, বিক্রয়মূল্য ও পরিমাণ দিন।');return}db.products.push({id:Date.now(),name,cost,sell,qty,unit});pname.value=pcost.value=psell.value=pqty.value=punit.value='';persist()}
+function addLine(){let id=+billProduct.value,p=db.products.find(x=>x.id===id),q=+billQty.value;if(!p||q<=0){alert('পণ্য ও সঠিক পরিমাণ নির্বাচন করুন।');return}if(q>p.qty){alert('স্টকে পর্যাপ্ত পণ্য নেই।');return}let old=cart.find(x=>x.id===id);if(old)old.qty+=q;else cart.push({id,name:p.name,price:p.sell,qty:q,unit:p.unit});renderCart()}
+function renderCart(){billLines.innerHTML=cart.length?cart.map(x=>`<div class="item">${x.name} — ${x.qty} ${x.unit||''} × ${money(x.price)} = <b>${money(x.qty*x.price)}</b></div>`).join(''):'কোনো পণ্য যোগ হয়নি।';grandTotal.textContent=money(cart.reduce((s,x)=>s+x.qty*x.price,0)+(+extra.value||0))}
+extra.addEventListener('input',renderCart);
+function saveBill(){if(!cart.length){alert('আগে বিলে পণ্য যোগ করুন।');return}for(let x of cart){let p=db.products.find(p=>p.id===x.id);if(!p||p.qty<x.qty){alert('স্টক পরিবর্তিত হয়েছে। আবার যাচাই করুন।');return}}let subtotal=cart.reduce((s,x)=>s+x.qty*x.price,0),add=+extra.value||0;cart.forEach(x=>db.products.find(p=>p.id===x.id).qty-=x.qty);db.bills.unshift({id:Date.now(),date:new Date().toISOString(),customer:customer.value,employee:employee.value,items:cart,subtotal,extra:add,total:subtotal+add,note:billNote.value});cart=[];customer.value=extra.value=billNote.value='';renderCart();persist();tab('history');alert('বিল সংরক্ষণ হয়েছে।')}
+function render(){countProducts.textContent=db.products.length;countBills.textContent=db.bills.length;let today=new Date().toDateString();todaySales.textContent=money(db.bills.filter(b=>new Date(b.date).toDateString()===today).reduce((s,b)=>s+b.total,0));productList.innerHTML=db.products.length?db.products.map(p=>`<div class="item"><b>${esc(p.name)}</b><br><span class="muted">স্টক: ${p.qty} ${esc(p.unit||'')} • বিক্রয়: ${money(p.sell)}</span> <button class="secondary" onclick="deleteProduct(${p.id})">মুছুন</button></div>`).join(''):'এখনো কোনো পণ্য যোগ হয়নি।';billProduct.innerHTML='<option value="">পণ্য বাছুন</option>'+db.products.map(p=>`<option value="${p.id}">${esc(p.name)} — ${money(p.sell)} (স্টক ${p.qty})</option>`).join('');billList.innerHTML=db.bills.length?db.bills.map(b=>`<div class="item"><b>${esc(b.customer||'নামহীন ক্রেতা')}</b> • ${new Date(b.date).toLocaleString('bn-BD')}<br><span class="muted">${esc(b.employee)} • ${b.items.length}টি পণ্যের লাইন</span><br><b>${money(b.total)}</b> <button class="secondary" onclick="showBill(${b.id})">বিস্তারিত</button></div>`).join(''):'এখনো কোনো বিল নেই।';shopName.value=db.shop||'KM WHOLESALE'}
+function deleteProduct(id){if(confirm('এই পণ্যটি মুছবেন?')){db.products=db.products.filter(p=>p.id!==id);persist()}}
+function showBill(id){let b=db.bills.find(x=>x.id===id);alert(`KM WHOLESALE\nক্রেতা: ${b.customer||'-'}\nকর্মচারী: ${b.employee}\n${b.items.map(x=>x.name+' × '+x.qty+' = '+money(x.qty*x.price)).join('\n')}\nপণ্যের মোট: ${money(b.subtotal)}\nঅতিরিক্ত: ${money(b.extra)}\nসর্বমোট: ${money(b.total)}`)}
+function saveSettings(){db.shop=shopName.value.trim()||'KM WHOLESALE';persist();alert('সংরক্ষণ হয়েছে')}
+function backup(){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.href=u;a.download='KM-Wholesale-backup.json';a.click();URL.revokeObjectURL(u)}
+function restore(){let f=restoreFile.files[0];if(!f){alert('আগে JSON ব্যাকআপ ফাইল বাছুন।');return}let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.products)||!Array.isArray(x.bills))throw 0;db=x;persist();alert('ব্যাকআপ ফিরিয়ে আনা হয়েছে')}catch(e){alert('ফাইলটি সঠিক KM ব্যাকআপ নয়')}};r.readAsText(f)}
+function clearData(){if(confirm('নিশ্চিত? সব পণ্য ও বিল মুছে যাবে।')){db={products:[],bills:[],shop:'KM WHOLESALE'};cart=[];persist()}}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();renderCart();
+</script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{})); }</script>
+</body></html>
