@@ -7,7 +7,8 @@ service cloud.firestore {
     function hasRole(role) {
       return signedIn()
         && exists(/databases/$(database)/documents/userRoles/$(request.auth.uid))
-        && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.role == role;
+        && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.role == role
+        && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.active == true;
     }
     function isAdmin() { return hasRole('admin'); }
     function isEmployee() { return hasRole('employee'); }
