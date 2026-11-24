@@ -60,16 +60,24 @@ button{cursor:pointer}
   .account-current strong{font-size:16px}
   .stat strong{font-size:17px}
 }
-</style>
+.home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.shortcut{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 4px;text-align:center;color:var(--ink);font-weight:650}.shortcut .ico{display:block;font-size:26px;margin-bottom:6px}.shortcut span:last-child{font-size:12px}.progress-track{height:10px;background:#e8eee9;border-radius:20px;overflow:hidden}.progress-fill{height:100%;background:#198754}@media(max-width:520px){.home-shortcuts{gap:6px}.shortcut{padding:9px 2px}.shortcut .ico{font-size:23px}.shortcut span:last-child{font-size:10px}}</style>
 </head>
 <body>
 <header><h1>KM</h1></header>
 <nav>
-<button class="active" data-tab="home">Home</button><button data-tab="outlets">Outlet</button><button data-tab="slabs">Gift Slabs</button><button data-tab="products">Product</button><button data-tab="invoice">Create Invoice</button><button data-tab="history">Invoice History</button><button data-tab="settings">Settings</button>
+<button class="active" data-tab="home">Home</button><button data-tab="outlets">Outlets</button><button data-tab="slabs">Gift Slabs</button><button data-tab="products">Products</button><button data-tab="invoice">Billing</button><button data-tab="history">Invoices</button><button data-tab="operations">Routes &amp; Targets</button><button data-tab="settings">Settings</button>
 </nav>
 <main>
 <section id="home" class="panel active">
-<div class="grid">
+<div class="card"><h2>KM Dashboard</h2><div class="home-shortcuts">
+<button class="shortcut" onclick="tab('invoice')"><span class="ico">🧾</span><span>New Bill</span></button>
+<button class="shortcut" onclick="tab('outlets')"><span class="ico">🏪</span><span>Outlets</span></button>
+<button class="shortcut" onclick="tab('products')"><span class="ico">📦</span><span>Products</span></button>
+<button class="shortcut" onclick="tab('operations')"><span class="ico">🚚</span><span>Delivery</span></button>
+<button class="shortcut" onclick="tab('operations')"><span class="ico">🎯</span><span>Targets</span></button>
+<button class="shortcut" onclick="tab('operations')"><span class="ico">🗺️</span><span>Routes</span></button>
+<button class="shortcut" onclick="tab('history')"><span class="ico">📊</span><span>Reports</span></button>
+<button class="shortcut" onclick="tab('settings')"><span class="ico">⚙️</span><span>Settings</span></button></div></div><div class="grid">
 <div class="stat"><small>Total Products</small><strong id="countProducts">0</strong></div>
 <div class="stat"><small>Total Invoices</small><strong id="countBills">0</strong></div>
 <div class="stat"><small>Today's Sales</small><strong id="todaySales">৳0</strong></div>
@@ -79,7 +87,7 @@ button{cursor:pointer}
 </section>
 <section id="outlets" class="panel"><div class="card"><h2>Add New Outlet</h2>
 <label>Store Name *</label><input id="outName" placeholder="Store Name"><label>Proprietor Name *</label><input id="outOwner" placeholder="Proprietor Name">
-<label>Phone Number</label><input id="outPhone"><label>Address</label><input id="outAddress">
+<label>Phone Number</label><input id="outPhone"><label>Address</label><input id="outAddress"><label>Route</label><select id="outRoute"><option value="1">Route 1</option><option value="2">Route 2</option><option value="3">Route 3</option><option value="4">Route 4</option><option value="5">Route 5</option><option value="6">Route 6</option></select>
 <button class="primary" onclick="addOutlet()">Save Outlet</button></div><div class="card"><h2>Outlet List</h2><div id="outletList"></div></div></section>
 <section id="slabs" class="panel"><div class="card"><h2>Set Gift Slab</h2>
 <label>Outlet</label><select id="slabOutlet"></select><label>Slab Target Amount (BDT)</label><input id="slabTarget" type="number" min="1">
@@ -96,7 +104,7 @@ button{cursor:pointer}
 <section id="invoice" class="panel">
 <div class="card"><h2>New Invoice</h2>
 <label>Select Outlet *</label><select id="billOutlet"></select><label>Proprietor Name *</label><div id="billOwner" class="item muted">Proprietor name appears after selecting an outlet</div>
-<label>Prepared By</label><select id="employee"><option>Admin</option><option>Employee 1</option><option>Employee 2</option><option>Employee 3</option><option>Employee 4</option><option>Employee 5</option></select>
+<label>Prepared By</label><select id="employee"><option>Admin</option></select>
 <div class="row"><div><label>Product</label><select id="billProduct"></select></div><div><label>Quantity</label><input id="billQty" type="number" min="0.01" step="0.01" value="1"></div></div>
 <button class="secondary" onclick="addLine()">Add to Invoice</button>
 <div id="billLines" class="item muted">No products added to invoice.</div>
@@ -108,8 +116,17 @@ button{cursor:pointer}
 </div>
 </section>
 <section id="history" class="panel"><div class="card"><h2>Invoice History</h2><div id="billList" class="muted">No invoices yet.</div></div></section>
+<section id="operations" class="panel">
+<div class="card"><h2>Admin • Employee & Route Setup</h2>
+<label>Employee Name</label><input id="empName" placeholder="Employee name">
+<label>Route</label><select id="empRoute"><option value="1">Route 1</option><option value="2">Route 2</option><option value="3">Route 3</option><option value="4">Route 4</option><option value="5">Route 5</option><option value="6">Route 6</option></select>
+<label>Monthly Sales Target (BDT)</label><input id="empTarget" type="number" min="1">
+<button class="primary" onclick="saveEmployee()">Save Employee</button></div>
+<div class="card"><h2>Employee Achievement</h2><div id="employeeStats"></div></div>
+<div class="card"><h2>Route Overview</h2><div id="routeStats"></div></div>
+<div class="card"><h2>Delivery Management</h2><div id="deliveryList"></div></div></section>
 <section id="settings" class="panel">
-<div class="card"><h2>Settings</h2><p>App name: <b>KM</b></p></div>
+<div class="card"><h2>Settings</h2><p>App name: <b>KM</b></p><label>Language / ভাষা</label><select id="languageSelect" onchange="setLanguage(this.value)"><option value="en">English</option><option value="bn">বাংলা</option></select></div>
 <div class="card"><h3>Data Backup</h3><p class="muted">Download this device's data as a JSON file. It will not sync automatically to other devices.</p><button class="secondary" onclick="backup()">Download Backup</button><label>Restore from Backup File</label><input type="file" id="restoreFile" accept=".json,application/json"><button class="secondary" onclick="restore()">Restore Backup</button></div>
 <div class="card"><button class="secondary" onclick="clearData()">Delete All Data</button><p class="muted">This will delete products and invoices from this browser.</p></div>
 </section>
@@ -119,15 +136,15 @@ const KEY='km_wholesale_starter_v1';
 let db=JSON.parse(localStorage.getItem(KEY)||'{"products":[],"bills":[],"shop":"KM"}');
 db.outlets=Array.isArray(db.outlets)?db.outlets:[];
 db.slabs=Array.isArray(db.slabs)?db.slabs:[];
-db.ledger=Array.isArray(db.ledger)?db.ledger:[];
+db.ledger=Array.isArray(db.ledger)?db.ledger:[];db.employees=Array.isArray(db.employees)?db.employees:[];db.language=db.language||'en';db.bills.forEach(b=>{if(!b.deliveryStatus)b.deliveryStatus='Pending'});
 let cart=[];
 const num=v=>{const n=Number.parseFloat(String(v??'').replace(/,/g,''));return Number.isFinite(n)?n:0};
 const money=n=>'৳'+num(n).toLocaleString('en-BD',{minimumFractionDigits:0,maximumFractionDigits:2});
-function persist(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));render();renderOperations();applyLanguage()}
 function tab(id){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 function addOutlet(){let name=outName.value.trim(),owner=outOwner.value.trim();if(!name||!owner){alert('Store name and proprietor name are required');return}
-db.outlets.push({id:Date.now(),name,owner,phone:outPhone.value,address:outAddress.value});outName.value=outOwner.value=outPhone.value=outAddress.value='';persist();alert('Outlet saved')}
+db.outlets.push({id:Date.now(),name,owner,phone:outPhone.value,address:outAddress.value,route:Number(document.getElementById('outRoute')?.value||1)});outName.value=outOwner.value=outPhone.value=outAddress.value='';persist();alert('Outlet saved')}
 function saveSlab(){let outletId=+slabOutlet.value,target=+slabTarget.value,gift=+slabGift.value,giftName=slabGiftName.value.trim();if(!outletId||target<=0||slabGift.value===''||!giftName){alert('Enter outlet, slab target, gift name and gift value');return}
 let x=db.slabs.find(a=>a.outletId===outletId);if(x){if(!confirm('The new slab will start from zero.'))return;x.target=target;x.gift=gift;x.giftName=giftName;x.progress=0}else db.slabs.push({id:Date.now(),outletId,target,gift,giftName,progress:0});slabGiftName.value=slabTarget.value=slabGift.value='';persist();alert('Gift slab saved')}
 function resetSlab(id){let x=db.slabs.find(a=>a.id===id);if(x&&confirm('Start a new slab from zero?')){x.progress=0;persist()}}
@@ -254,7 +271,7 @@ function saveBill(){
  const outlet=db.outlets.find(o=>num(o.id)===outletId);
  const previousDue=outletPreviousDue(outletId);
  const invoiceNo=nextInvoiceNo();
- db.bills.unshift({id:Date.now(),invoiceNo,date:new Date().toISOString(),outletId,outletName:outlet?.name||'',outletOwner:outlet?.owner||'',employee:employee.value,items,subtotal:t.gross,lineDiscount:t.lineDiscount,extra:add,billDiscountPct:num(billDiscountPct.value),billDiscountAmount:num(billDiscountAmt.value),billDiscount:t.billDiscount,total:t.final,previousDue,totalOutstanding:previousDue+t.final,note:billNote.value});
+ db.bills.unshift({id:Date.now(),invoiceNo,date:new Date().toISOString(),deliveryStatus:'Pending',outletId,outletName:outlet?.name||'',outletOwner:outlet?.owner||'',employee:employee.value,items,subtotal:t.gross,lineDiscount:t.lineDiscount,extra:add,billDiscountPct:num(billDiscountPct.value),billDiscountAmount:num(billDiscountAmt.value),billDiscount:t.billDiscount,total:t.final,previousDue,totalOutstanding:previousDue+t.final,note:billNote.value});
  let sl=db.slabs.find(x=>num(x.outletId)===outletId);if(sl)sl.progress+=Math.max(0,t.final-add);
  cart=[];document.getElementById('extra').value='0';document.getElementById('billNote').value='';document.getElementById('billDiscountPct').value='0';document.getElementById('billDiscountAmt').value='0';
  renderCart();persist();tab('history');alert('Invoice saved. Invoice No: '+invoiceNo);
@@ -278,9 +295,15 @@ w.document.open();w.document.write(html);w.document.close();
 }
 function saveSettings(){db.shop='KM';persist();alert('Saved')}
 function backup(){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.href=u;a.download='KM-backup.json';a.click();URL.revokeObjectURL(u)}
-function restore(){let f=restoreFile.files[0];if(!f){alert('Please select a JSON backup file first.');return}let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.products)||!Array.isArray(x.bills))throw 0;x.outlets=Array.isArray(x.outlets)?x.outlets:[];x.slabs=Array.isArray(x.slabs)?x.slabs:[];x.ledger=Array.isArray(x.ledger)?x.ledger:[];db=x;persist();alert('Backup restored')}catch(e){alert('This is not a valid KM backup file')}};r.readAsText(f)}
-function clearData(){if(confirm('Are you sure? All products and invoices will be deleted.')){db={products:[],bills:[],outlets:[],slabs:[],ledger:[],shop:'KM'};cart=[];persist()}}
+function restore(){let f=restoreFile.files[0];if(!f){alert('Please select a JSON backup file first.');return}let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x.products)||!Array.isArray(x.bills))throw 0;x.outlets=Array.isArray(x.outlets)?x.outlets:[];x.slabs=Array.isArray(x.slabs)?x.slabs:[];x.ledger=Array.isArray(x.ledger)?x.ledger:[];x.employees=Array.isArray(x.employees)?x.employees:[];db=x;persist();alert('Backup restored')}catch(e){alert('This is not a valid KM backup file')}};r.readAsText(f)}
+function clearData(){if(confirm('Are you sure? All products and invoices will be deleted.')){db={products:[],bills:[],outlets:[],slabs:[],ledger:[],employees:[],shop:'KM',language:'en'};cart=[];persist()}}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-render();renderCart();updateAccountSummary();
+
+function saveEmployee(){var n=empName.value.trim(),r=Number(empRoute.value),t=num(empTarget.value);if(!n||t<=0){alert('Enter employee and target');return}var e=db.employees.find(x=>x.name.toLowerCase()===n.toLowerCase());if(e){e.route=r;e.target=t}else db.employees.push({id:Date.now(),name:n,route:r,target:t});empName.value='';empTarget.value='';persist()}
+function setDelivery(id,v){var b=db.bills.find(x=>Number(x.id)===Number(id));if(b){b.deliveryStatus=v;persist()}}
+function setLanguage(v){db.language=v;localStorage.setItem(KEY,JSON.stringify(db));applyLanguage()}
+function applyLanguage(){var l=db.language||'en';document.documentElement.lang=l;var x=document.getElementById('languageSelect');if(x)x.value=l}
+function renderOperations(){var a=document.getElementById('employeeStats');if(!a)return;employee.innerHTML='<option>Admin</option>'+db.employees.map(e=>'<option>'+esc(e.name)+'</option>').join('');a.innerHTML=db.employees.map(e=>{var d=new Date(),v=db.bills.filter(b=>b.employee===e.name&&new Date(b.date).getMonth()===d.getMonth()&&new Date(b.date).getFullYear()===d.getFullYear()).reduce((s,b)=>s+num(b.total),0),p=e.target?Math.min(100,v/e.target*100):0;return '<div class="item"><b>'+esc(e.name)+'</b> • Route '+e.route+'<p>Target '+money(e.target)+' • Sales '+money(v)+'</p><div class="progress-track"><div class="progress-fill" style="width:'+p+'%"></div></div><small>'+p.toFixed(1)+'% achieved • Remaining '+money(Math.max(0,e.target-v))+'</small></div>'}).join('')||'No employees yet';routeStats.innerHTML=[1,2,3,4,5,6].map(n=>{var o=db.outlets.filter(x=>Number(x.route||1)===n),ids=o.map(x=>Number(x.id)),v=db.bills.filter(b=>ids.includes(Number(b.outletId))).reduce((s,b)=>s+num(b.total),0);return '<div class="item"><b>Route '+n+'</b> • '+o.length+' outlets • '+money(v)+' sales</div>'}).join('');deliveryList.innerHTML=db.bills.map(b=>'<div class="item"><b>'+esc(b.invoiceNo)+' • '+esc(b.outletName)+'</b><br>'+money(b.total)+'<label>Delivery Status</label><select onchange="setDelivery('+b.id+',this.value)"><option '+(b.deliveryStatus==='Pending'?'selected':'')+'>Pending</option><option '+(b.deliveryStatus==='Processing'?'selected':'')+'>Processing</option><option '+(b.deliveryStatus==='Delivered'?'selected':'')+'>Delivered</option></select></div>').join('')||'No invoices yet'}
+\nrender();renderOperations();renderCart();updateAccountSummary();applyLanguage();
 </script>
 </body></html>
