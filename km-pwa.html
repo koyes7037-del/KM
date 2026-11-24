@@ -61,8 +61,27 @@ button{cursor:pointer}
   .stat strong{font-size:17px}
 }
 .home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.shortcut{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 4px;text-align:center;color:var(--ink);font-weight:650}.shortcut .ico{display:block;font-size:26px;margin-bottom:6px}.shortcut span:last-child{font-size:12px}.progress-track{height:10px;background:#e8eee9;border-radius:20px;overflow:hidden}.progress-fill{height:100%;background:#198754}@media(max-width:520px){.home-shortcuts{gap:6px}.shortcut{padding:9px 2px}.shortcut .ico{font-size:23px}.shortcut span:last-child{font-size:10px}}</style>
-</head>
-<body>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>\n<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>\n<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"><\/script>\n</head>
+<body class="auth-locked">\n
+<style>
+body.auth-locked>header,body.auth-locked>nav,body.auth-locked>main{display:none!important}
+#kmAuthGate{max-width:430px;margin:12vh auto;padding:18px;background:#fff;border:1px solid #dce5df;border-radius:16px;box-shadow:0 8px 28px #102c1b12;font-family:system-ui,Arial,sans-serif}
+#kmAuthGate h2{margin:0 0 8px;color:#14532d}#kmAuthGate label{display:block;margin:12px 0 5px;font-size:13px;font-weight:650}
+#kmAuthGate input{width:100%;padding:12px;border:1px solid #cbd8cf;border-radius:9px;font:inherit}
+#kmAuthGate button{width:100%;padding:12px;margin-top:12px;border:0;border-radius:9px;background:#198754;color:white;font-weight:700}
+#kmAuthMessage{font-size:13px;line-height:1.5;margin-top:10px;color:#526257}
+#kmAccountBar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;background:#eaf3ec;font:13px system-ui}
+#kmAccountBar button{border:1px solid #cbd8cf;border-radius:8px;background:white;padding:7px 10px}
+</style>
+<div id="kmAuthGate">
+<h2>KM Login</h2><p>Sign in with your KM account.</p>
+<label>Email</label><input id="kmLoginEmail" type="email" autocomplete="username" placeholder="Email address">
+<label>Password</label><input id="kmLoginPassword" type="password" autocomplete="current-password" placeholder="Password">
+<button id="kmLoginButton" type="button">Sign In</button>
+<div id="kmAuthMessage">Only accounts authorized by KM Admin can access the app.</div>
+</div>
+<div id="kmAccountBar" hidden><span id="kmAccountLabel">Signed in</span><button id="kmLogoutButton" type="button">Sign Out</button></div>
+
 <header><h1>KM</h1></header>
 <nav>
 <button class="active" data-tab="home">Home</button><button data-tab="outlets">Outlets</button><button data-tab="slabs">Gift Slabs</button><button data-tab="products">Products</button><button data-tab="orders">Orders</button><button data-tab="invoice">Billing</button><button data-tab="history">Invoices</button><button data-tab="operations">Routes &amp; Targets</button><button data-tab="settings">Settings</button>
@@ -331,5 +350,12 @@ function applyLanguage(){var l=db.language||'en';document.documentElement.lang=l
 function renderOperations(){var a=document.getElementById('employeeStats');if(!a)return;var by=document.getElementById('outEnteredBy');if(by)by.innerHTML='<option value="">Select Employee / Admin</option><option value="Admin">Admin</option>'+db.employees.map(e=>'<option value="'+esc(e.name)+'">'+esc(e.name)+'</option>').join('');employee.innerHTML='<option>Admin</option>'+db.employees.map(e=>'<option>'+esc(e.name)+'</option>').join('');a.innerHTML=db.employees.map(e=>{var d=new Date(),v=db.bills.filter(b=>b.employee===e.name&&new Date(b.date).getMonth()===d.getMonth()&&new Date(b.date).getFullYear()===d.getFullYear()).reduce((s,b)=>s+num(b.total),0),p=e.target?Math.min(100,v/e.target*100):0;return '<div class="item"><b>'+esc(e.name)+'</b> • Route '+e.route+'<p>Target '+money(e.target||0)+' • Sales '+money(v)+'</p><div class="progress-track"><div class="progress-fill" style="width:'+p+'%"></div></div><small>'+p.toFixed(1)+'% achieved • Remaining '+money(Math.max(0,(e.target||0)-v))+'</small><p><button class="secondary" onclick="editEmployee('+e.id+')">Edit</button> <button class="secondary" onclick="deleteEmployee('+e.id+')">Delete</button></p></div>'}).join('')||'No employees added. Admin can add employees whenever required.';routeStats.innerHTML=[1,2,3,4,5,6].map(n=>{var o=db.outlets.filter(x=>String(x.route)===String(n)),ids=o.map(x=>Number(x.id)),v=db.bills.filter(b=>ids.includes(Number(b.outletId))).reduce((s,b)=>s+num(b.total),0);return '<div class="item"><b>Route '+n+'</b> • '+o.length+' outlets • '+money(v)+' sales</div>'}).join('')+'<div class="item"><b>None</b> • '+db.outlets.filter(x=>!x.route||x.route==='None').length+' outlets</div><div class="item"><b>Other</b> • '+db.outlets.filter(x=>String(x.route||'').startsWith('Other')).length+' outlets</div>';deliveryList.innerHTML=db.bills.map(b=>'<div class="item"><b>'+esc(b.invoiceNo)+' • '+esc(b.outletName)+'</b><br>'+money(b.total)+'<br>Delivery: <b>'+esc(b.deliveryStatus||'Pending')+'</b>'+(b.deliveryStatus!=='Delivered'?'<p><button class="primary" onclick="markDelivered('+b.id+')">Delivered &amp; Approved</button></p>':'<small class="muted">Completed '+(b.deliveredAt?new Date(b.deliveredAt).toLocaleString('en-BD'):'')+'</small>')+'</div>').join('')||'No invoices yet';renderOrders()}
 
 render();renderOperations();renderCart();updateAccountSummary();applyLanguage();
-</script>
+\n
+const kmFirebaseConfig={apiKey:"AIzaSyAYv3-rtCaCuZPD0jK-jeYwA_3Ys7Ittyc",authDomain:"km-wholesale-7dbb4.firebaseapp.com",projectId:"km-wholesale-7dbb4",storageBucket:"km-wholesale-7dbb4.firebasestorage.app",messagingSenderId:"1002111574436",appId:"1:1002111574436:web:16e7b339a9da923ea3e131"};
+let kmAuth=null,kmFirestore=null,kmCurrentRole=null;
+function kmShowMessage(message){const el=document.getElementById('kmAuthMessage');if(el)el.textContent=message;}
+async function kmSignIn(){const email=document.getElementById('kmLoginEmail').value.trim(),password=document.getElementById('kmLoginPassword').value;if(!email||!password){kmShowMessage('Enter your email and password.');return;}const b=document.getElementById('kmLoginButton');b.disabled=true;b.textContent='Signing in...';try{await kmAuth.signInWithEmailAndPassword(email,password);}catch(e){kmShowMessage(e.code==='auth/invalid-credential'?'Email or password is incorrect.':e.message||'Sign in failed.');}finally{b.disabled=false;b.textContent='Sign In';}}
+async function kmHandleAuth(user){if(!user){kmCurrentRole=null;document.body.classList.add('auth-locked');document.getElementById('kmAuthGate').hidden=false;document.getElementById('kmAccountBar').hidden=true;return;}try{const snap=await kmFirestore.collection('userRoles').doc(user.uid).get();if(!snap.exists||!snap.data().active&&snap.data().active!==undefined||!['admin','employee'].includes(snap.data().role)){await kmAuth.signOut();kmShowMessage('This account has no active KM role. Ask the project administrator to authorize it.');return;}kmCurrentRole=snap.data().role;document.body.classList.remove('auth-locked');document.getElementById('kmAuthGate').hidden=true;document.getElementById('kmAccountBar').hidden=false;document.getElementById('kmAccountLabel').textContent=(user.email||'KM user')+' • '+kmCurrentRole.toUpperCase();if(kmCurrentRole==='employee'){document.querySelectorAll('nav button[data-tab="invoice"],nav button[data-tab="history"],nav button[data-tab="products"],nav button[data-tab="slabs"],nav button[data-tab="settings"],.home-shortcuts button[onclick*="invoice"],.home-shortcuts button[onclick*="products"],.home-shortcuts button[onclick*="settings"]').forEach(x=>x.hidden=true);const billing=document.getElementById('invoice');if(billing)billing.hidden=true;const history=document.getElementById('history');if(history)history.hidden=true;}}catch(e){await kmAuth.signOut();kmShowMessage('Could not verify KM access. Check Firestore rules and try again.');}}
+try{if(!firebase.apps.length)firebase.initializeApp(kmFirebaseConfig);kmAuth=firebase.auth();kmFirestore=firebase.firestore();document.getElementById('kmLoginButton').addEventListener('click',kmSignIn);document.getElementById('kmLoginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')kmSignIn()});document.getElementById('kmLogoutButton').addEventListener('click',()=>kmAuth.signOut());kmAuth.onAuthStateChanged(kmHandleAuth);}catch(e){kmShowMessage('Firebase could not start: '+e.message);}
+\n</script>
 </body></html>
