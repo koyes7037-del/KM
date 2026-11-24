@@ -1,4 +1,4 @@
-const CACHE = "km-wholesale-pwa-v2";
+const CACHE = "km-pwa-v3";
 const FILES = ["./", "./km-pwa.html", "./manifest.webmanifest", "./icon.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)));
@@ -10,6 +10,17 @@ self.addEventListener("activate", event => {
 });
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+  const isAppPage = new URL(event.request.url).pathname.endsWith("/km-pwa.html");
+  if (isAppPage) {
+    event.respondWith(fetch(event.request).then(response => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put("./km-pwa.html", copy));
+      }
+      return response;
+    }).catch(() => caches.match("./km-pwa.html")));
+    return;
+  }
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
     const copy = response.clone();
     caches.open(CACHE).then(cache => cache.put(event.request, copy));
