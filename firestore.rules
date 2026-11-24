@@ -16,12 +16,19 @@ service cloud.firestore {
     // Main KM data: employees can view shared product/outlet information;
     // only Admin can change billing, products, outlets, settings and reports.
     match /appData/{documentId} {
-      allow read: if (documentId == 'main' && isAdmin())
-        || (documentId == 'shared' && (isAdmin() || isEmployee()));
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
 
     // Employees may submit only orders attributed to their own signed-in UID.
+    // Each employee can read only the document for their assigned route.
+    match /employeeData/{routeId} {
+      allow read: if isAdmin()
+        || (isEmployee()
+          && resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route);
+      allow write: if isAdmin();
+    }
+
     match /orders/{orderId} {
       allow create: if isAdmin() || (isEmployee()
         && request.resource.data.createdBy == request.auth.uid
