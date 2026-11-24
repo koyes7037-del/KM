@@ -24,7 +24,9 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow create: if isEmployee()
         && request.resource.data.createdBy == request.auth.uid
-        && request.resource.data.status == 'Pending Admin Review';
+        && request.resource.data.status == 'Pending Admin Review'
+        && request.resource.data.employee == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.name
+        && request.resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route;
       allow read: if isAdmin()
         || (isEmployee() && resource.data.createdBy == request.auth.uid);
       allow update, delete: if isAdmin();
