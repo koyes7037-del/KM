@@ -1,6 +1,6 @@
 {
-  "name": "KM",
-  "short_name": "KM",
+  "name": "Valuation",
+  "short_name": "Valuation",
   "start_url": "./km-pwa.html",
   "scope": "./",
   "display": "standalone",
