@@ -11,8 +11,9 @@
 header{background:var(--green);color:white;padding:18px 16px;position:sticky;top:0;z-index:2}
 h1{font-size:24px;margin:0;font-weight:800;letter-spacing:.4px}header p{margin:4px 0 0;font-size:13px;opacity:.9}
 nav{display:flex;gap:8px;overflow:auto;padding:10px;background:white;border-bottom:1px solid var(--line);position:sticky;top:82px;z-index:2}
-nav button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 13px;font-weight:650;color:var(--green)}
-nav button.active{background:var(--green);color:#fff}
+nav button{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 13px;font-weight:650;color:var(--green);display:flex;align-items:center;gap:7px;min-height:44px;box-shadow:0 1px 3px #102c1b08;transition:background .15s,border-color .15s}
+nav button .nav-icon{font-size:19px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+nav button.active{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 3px 8px #14532d26}
 main{padding:14px;max-width:850px;margin:auto}.panel{display:none}.panel.active{display:block}
 .card{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px;box-shadow:0 2px 8px #102c1b0a}
 h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 8px}
@@ -36,7 +37,7 @@ button{cursor:pointer}
   header p{font-size:12px}
   nav{top:0;gap:7px;padding:8px 10px;scrollbar-width:none}
   nav::-webkit-scrollbar{display:none}
-  nav button{padding:10px 12px;font-size:13px;min-height:40px}
+  nav button{padding:9px 11px;font-size:13px;min-height:42px;gap:6px}nav button .nav-icon{font-size:18px}
   main{padding:10px;max-width:100%;}
   .card{padding:12px;border-radius:12px;margin-bottom:10px}
   h2{font-size:17px;margin-bottom:10px}
@@ -87,8 +88,8 @@ body.auth-locked>header,body.auth-locked>nav,body.auth-locked>main{display:none!
 <div id="kmAccountBar" hidden><span id="kmAccountLabel">Signed in</span><span id="kmSyncStatus" aria-live="polite">Connecting…</span><button id="kmLogoutButton" type="button">Sign Out</button></div>
 
 <header><h1>KM</h1></header>
-<nav>
-<button class="active" data-tab="home">Home</button><button data-tab="outlets">Outlets</button><button data-tab="slabs">Gift Slabs</button><button data-tab="products">Products</button><button data-tab="orders">Orders</button><button data-tab="invoice">Billing</button><button data-tab="history">Invoices</button><button data-tab="operations">Routes &amp; Targets</button><button data-tab="settings">Settings</button>
+<nav aria-label="Main navigation">
+<button class="active" data-tab="home"><span class="nav-icon" aria-hidden="true">🏠</span><span>Home</span></button><button data-tab="outlets"><span class="nav-icon" aria-hidden="true">🏪</span><span>Outlets</span></button><button data-tab="slabs"><span class="nav-icon" aria-hidden="true">🎁</span><span>Gift Slabs</span></button><button data-tab="products"><span class="nav-icon" aria-hidden="true">📦</span><span>Products</span></button><button data-tab="orders"><span class="nav-icon" aria-hidden="true">🛒</span><span>Orders</span></button><button data-tab="invoice"><span class="nav-icon" aria-hidden="true">🧾</span><span>Billing</span></button><button data-tab="history"><span class="nav-icon" aria-hidden="true">📑</span><span>Invoices</span></button><button data-tab="operations"><span class="nav-icon" aria-hidden="true">🚚</span><span>Routes &amp; Targets</span></button><button data-tab="settings"><span class="nav-icon" aria-hidden="true">⚙️</span><span>Settings</span></button>
 </nav>
 <main>
 <section id="home" class="panel active">
