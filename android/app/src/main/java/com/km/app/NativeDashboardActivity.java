@@ -88,22 +88,27 @@ public class NativeDashboardActivity extends Activity {
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
         GridLayout grid = new GridLayout(this);
-        grid.setColumnCount(3);
+        grid.setColumnCount(4);
         grid.setUseDefaultMargins(false);
         int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        int tileWidth = (screenWidth - dp(32) - dp(20)) / 3;
+        int tileWidth = (screenWidth - dp(32) - dp(24)) / 4;
 
         int animationIndex = 0;
         for (String[] item : modules) {
             LinearLayout tile = new LinearLayout(this);
             tile.setOrientation(LinearLayout.VERTICAL);
-            tile.setGravity(Gravity.CENTER);
-            tile.setBackground(shape(TILE, Color.rgb(216, 204, 229)));
-            tile.setElevation(dp(3));
-            tile.setPadding(dp(4), dp(13), dp(4), dp(12));
+            tile.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+            tile.setBackgroundColor(Color.TRANSPARENT);
+            tile.setPadding(dp(2), dp(3), dp(2), dp(5));
 
-            TextView icon = text(item[0], 29, false);
+            LinearLayout iconCard = new LinearLayout(this);
+            iconCard.setGravity(Gravity.CENTER);
+            iconCard.setBackground(shape(Color.rgb(232, 241, 248), Color.rgb(218, 230, 239)));
+            iconCard.setElevation(dp(2));
+            TextView icon = text(item[0], 34, false);
             icon.setGravity(Gravity.CENTER);
+            iconCard.addView(icon, new LinearLayout.LayoutParams(-1, -1));
+            tile.addView(iconCard, new LinearLayout.LayoutParams(-1, dp(78)));
             TextView label = text(item[1], 12, true);
             label.setGravity(Gravity.CENTER);
             label.setPadding(dp(2), dp(8), dp(2), 0);
@@ -121,7 +126,7 @@ public class NativeDashboardActivity extends Activity {
 
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
             lp.width = tileWidth;
-            lp.height = dp(108);
+            lp.height = dp(122);
             lp.setMargins(dp(3), dp(4), dp(3), dp(7));
             tile.setLayoutParams(lp);
             tile.setOnClickListener(v -> {
