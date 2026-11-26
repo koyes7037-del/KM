@@ -146,7 +146,7 @@ body.auth-locked>header,body.auth-locked>nav,body.auth-locked>main{display:none!
 <button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-truck"></use></svg></span><span>Delivery</span></button>
 <button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-target"></use></svg></span><span>Targets</span></button>
 <button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-route"></use></svg></span><span>Routes</span></button>
-<button class="shortcut" onclick="tab('history')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-chart"></use></svg></span><span>Reports</span></button>
+<button class="shortcut" onclick="tab('history')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-chart"></use></svg></span><span>Reports</span></button><button class="shortcut" onclick="tab('dealerReport');loadDealerPurchaseReport()"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-box"></use></svg></span><span>Dealer Purchases</span></button>
 <button class="shortcut" onclick="tab('settings')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-settings"></use></svg></span><span>Settings</span></button>
 <button class="shortcut" onclick="tab('home')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-home"></use></svg></span><span>Dashboard</span></button>
 <button class="shortcut" onclick="tab('outlets')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-store"></use></svg></span><span>Party / Shop</span></button>
@@ -215,6 +215,9 @@ body.auth-locked>header,body.auth-locked>nav,body.auth-locked>main{display:none!
 </div>
 </section>
 <section id="history" class="panel"><div class="card"><h2>Invoice History</h2><div id="billList" class="muted">No invoices yet.</div></div></section>
+<section id="dealerReport" class="panel">
+<div class="card"><h2>Dealer Purchase Report</h2><p class="muted">Dealer-wise product receiving and purchase totals from cloud records.</p><button class="secondary" onclick="loadDealerPurchaseReport()">Refresh Report</button><div id="dealerPurchaseReport" class="muted">Open this report to load dealer records.</div></div>
+</section>
 <section id="operations" class="panel">
 <div class="card"><h2>Admin • Employee & Route Setup</h2>
 <label>Employee Name</label><input id="empName" placeholder="Employee name">
@@ -236,13 +239,13 @@ let db=JSON.parse(localStorage.getItem(KEY)||'{"products":[],"bills":[],"shop":"
 db.outlets=Array.isArray(db.outlets)?db.outlets:[];
 db.slabs=Array.isArray(db.slabs)?db.slabs:[];
 db.ledger=Array.isArray(db.ledger)?db.ledger:[];db.employees=Array.isArray(db.employees)?db.employees:[];db.orders=Array.isArray(db.orders)?db.orders:[];db.language=db.language||'en';db.bills.forEach(b=>{if(!b.deliveryStatus)b.deliveryStatus='Pending'});
-let cart=[];let orderCart=[];let activeOrderId=null;let isSavingBill=false;db.receives=Array.isArray(db.receives)?db.receives:[];db.priceHistory=Array.isArray(db.priceHistory)?db.priceHistory:[];
+let cart=[];let orderCart=[];let activeOrderId=null;let isSavingBill=false;let dealerPurchaseRecords=[];let dealerNamesByUid={};db.receives=Array.isArray(db.receives)?db.receives:[];db.priceHistory=Array.isArray(db.priceHistory)?db.priceHistory:[];
 const num=v=>{const n=Number.parseFloat(String(v??'').replace(/,/g,''));return Number.isFinite(n)?n:0};
 const money=n=>'৳'+num(n).toLocaleString('en-BD',{minimumFractionDigits:0,maximumFractionDigits:2});
 function kmSetSyncStatus(message,isError=false){const el=document.getElementById('kmSyncStatus');if(el){el.textContent=message;el.style.color=isError?'#b42318':'#526257';}const dashboard=document.getElementById('kmDashboardSync');if(dashboard)dashboard.textContent=message;}
 function persist(){localStorage.setItem(KEY,JSON.stringify(db));render();renderOperations();applyLanguage();if(kmCurrentRole==='admin'&&!kmApplyingRemote){kmSetSyncStatus('Saving…');kmCloudSaveQueue=kmCloudSaveQueue.catch(()=>{}).then(()=>kmSaveSharedData()).then(()=>kmSetSyncStatus('Cloud synced')).catch(e=>{kmSetSyncStatus('Sync failed — saved on device',true);console.error('KM cloud save failed',e);});}}
 let kmCurrentTab='home';
-function tab(id,fromHistory=false){if(kmCurrentRole==='employee'&&!['home','outlets','orders','operations'].includes(id)){alert('Admin access required.');return;}if(kmCurrentRole==='dealer'&&!['home','products'].includes(id)){alert('এই মডিউলটি Dealer-এর জন্য চালু নয়।');return;}if(!fromHistory&&id!==kmCurrentTab){try{history.pushState({kmTab:id},'', '#'+id);}catch(e){}}kmCurrentTab=id;document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
+function tab(id,fromHistory=false){if(id==='dealerReport'&&kmCurrentRole!=='admin'){alert('Admin access required.');return;}if(kmCurrentRole==='employee'&&!['home','outlets','orders','operations'].includes(id)){alert('Admin access required.');return;}if(kmCurrentRole==='dealer'&&!['home','products'].includes(id)){alert('এই মডিউলটি Dealer-এর জন্য চালু নয়।');return;}if(!fromHistory&&id!==kmCurrentTab){try{history.pushState({kmTab:id},'', '#'+id);}catch(e){}}kmCurrentTab=id;document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
 try{history.replaceState({kmTab:'home'},'','#home');}catch(e){}
 window.addEventListener('popstate',function(event){const id=event.state&&event.state.kmTab;if(id&&document.getElementById(id)&&document.getElementById(id).classList.contains('panel')){tab(id,true);}else if(document.getElementById('home')){tab('home',true);}});
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
@@ -261,7 +264,24 @@ function addProduct(){if(!kmRequireRole('admin'))return;let name=pname.value.tri
 function editProductMrp(id){if(!kmRequireRole('admin'))return;const p=db.products.find(x=>Number(x.id)===Number(id));if(!p)return;const raw=prompt('নতুন MRP / Selling Price লিখুন',String(p.sell));if(raw===null)return;const next=Number(raw);if(!Number.isFinite(next)||next<0){alert('সঠিক MRP লিখুন।');return}if(next===Number(p.sell))return;p.priceHistory=Array.isArray(p.priceHistory)?p.priceHistory:[];p.priceHistory.push({price:Number(p.sell),date:new Date().toISOString(),by:'Admin',event:'Previous price'});db.priceHistory.push({id:Date.now(),productId:p.id,name:p.name,oldPrice:Number(p.sell),newPrice:next,date:new Date().toISOString(),by:'Admin'});p.sell=next;p.priceHistory.push({price:next,date:new Date().toISOString(),by:'Admin'});persist()}
 function showMrpHistory(id){const p=db.products.find(x=>Number(x.id)===Number(id));if(!p)return;const rows=db.priceHistory.filter(x=>Number(x.productId)===Number(id));alert(rows.length?rows.map(x=>new Date(x.date).toLocaleString()+' | '+money(x.oldPrice)+' → '+money(x.newPrice)).join('\\n'):'এই পণ্যের MRP পরিবর্তনের ইতিহাস নেই।')}
 async function dealerReceiveProduct(){if(!kmRequireRole('dealer'))return;const p=db.products.find(x=>Number(x.id)===Number(document.getElementById('receiveProduct').value)),qty=Number(document.getElementById('receiveQty').value),pct=Number(document.getElementById('receiveDiscount').value);if(!p||!Number.isFinite(qty)||qty<=0||!Number.isFinite(pct)||pct<0||pct>100){alert('পণ্য, পরিমাণ ও ০–১০০% ছাড় সঠিকভাবে দিন।');return}const purchasePrice=Number(p.sell)*(1-pct/100),record={id:Date.now(),productId:p.id,productName:p.name,mrp:Number(p.sell),discountPct:pct,purchasePrice,quantity:qty,total:purchasePrice*qty,date:new Date().toISOString(),dealerUid:kmAuth.currentUser.uid};db.receives.unshift(record);persist();try{await persistDealerReceives();alert('পণ্য গ্রহণের হিসাব ক্লাউডে সংরক্ষিত হয়েছে।')}catch(e){kmSetSyncStatus('Sync pending — device copy kept',true);alert('ডিভাইসে হিসাবটি রাখা হয়েছে, কিন্তু ক্লাউডে পাঠানো যায়নি। ইন্টারনেট ঠিক হলে আবার Sync করতে হবে।');console.error('Dealer receive sync failed',e)}}
-async function persistDealerReceives(){if(!kmFirestore||kmCurrentRole!=='dealer'||!kmAuth?.currentUser)throw new Error('Dealer cloud session is unavailable');await kmFirestore.collection('dealerData').doc(kmAuth.currentUser.uid).set({receives:db.receives,updatedAt:new Date().toISOString()},{merge:true});kmSetSyncStatus('Cloud synced')}
+async async function loadDealerPurchaseReport(){
+ if(!kmRequireRole('admin'))return;
+ const box=document.getElementById('dealerPurchaseReport');if(!box)return;box.textContent='Loading dealer purchase records…';
+ try{
+  const [snap,roles]=await Promise.all([kmFirestore.collection('dealerData').get(),kmFirestore.collection('userRoles').get()]);
+  dealerNamesByUid={};roles.forEach(d=>{const v=d.data()||{};if(v.role==='dealer')dealerNamesByUid[d.id]=v.name||v.email||d.id;});
+  dealerPurchaseRecords=[];snap.forEach(d=>{const v=d.data()||{};(Array.isArray(v.receives)?v.receives:[]).forEach(x=>dealerPurchaseRecords.push({...x,dealerUid:d.id}));});
+  dealerPurchaseRecords.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));renderDealerPurchaseReport();
+ }catch(e){box.textContent='Could not load dealer records. Publish the updated Firestore rules in Firebase Console, then refresh.';console.error('Dealer purchase report failed',e);}
+}
+function renderDealerPurchaseReport(){
+ const box=document.getElementById('dealerPurchaseReport');if(!box)return;
+ if(!dealerPurchaseRecords.length){box.textContent='No dealer purchase records found.';return;}
+ const total=dealerPurchaseRecords.reduce((a,x)=>a+num(x.total),0),qty=dealerPurchaseRecords.reduce((a,x)=>a+num(x.quantity),0),groups={};
+ dealerPurchaseRecords.forEach(x=>(groups[x.dealerUid]||(groups[x.dealerUid]=[])).push(x));
+ box.innerHTML='<div class="grid"><div class="stat"><small>Total Purchase</small><strong>'+money(total)+'</strong></div><div class="stat"><small>Total Quantity</small><strong>'+qty.toLocaleString()+'</strong></div><div class="stat"><small>Dealers</small><strong>'+Object.keys(groups).length+'</strong></div><div class="stat"><small>Entries</small><strong>'+dealerPurchaseRecords.length+'</strong></div></div>'+Object.keys(groups).map(uid=>'<div class="item"><h3>'+esc(dealerNamesByUid[uid]||uid)+'</h3>'+groups[uid].map(x=>'<p><b>'+esc(x.productName||'Product')+'</b><br>Qty: '+num(x.quantity)+' • MRP: '+money(x.mrp)+' • Discount: '+num(x.discountPct)+'%<br>Purchase: '+money(x.purchasePrice)+' • Total: <b>'+money(x.total)+'</b><br><small>'+esc(x.date?new Date(x.date).toLocaleString():'')+'</small></p>').join('')+'</div>').join('');
+}
+function persistDealerReceives(){if(!kmFirestore||kmCurrentRole!=='dealer'||!kmAuth?.currentUser)throw new Error('Dealer cloud session is unavailable');await kmFirestore.collection('dealerData').doc(kmAuth.currentUser.uid).set({receives:db.receives,updatedAt:new Date().toISOString()},{merge:true});kmSetSyncStatus('Cloud synced')}
 function renderDealerReceive(){const sel=document.getElementById('receiveProduct');if(!sel)return;const previous=sel.value;sel.innerHTML='<option value="">পণ্য নির্বাচন করুন</option>'+db.products.map(p=>'<option value="'+p.id+'">'+esc(p.name)+' — '+money(p.sell)+'</option>').join('');if(db.products.some(p=>String(p.id)===previous))sel.value=previous;updateReceivePreview();const box=document.getElementById('dealerReceiveHistory');if(box)box.innerHTML=db.receives.map(x=>'<div class="item"><b>'+esc(x.productName)+'</b><br>MRP '+money(x.mrp)+' • Discount '+x.discountPct+'% • Purchase '+money(x.purchasePrice)+'<br>Qty '+x.quantity+' • Total '+money(x.total)+'<br><small>'+new Date(x.date).toLocaleString()+'</small></div>').join('')||'No product receives yet.'}
 function updateReceivePreview(){const p=db.products.find(x=>Number(x.id)===Number(document.getElementById('receiveProduct')?.value)),pct=Math.max(0,Math.min(100,num(document.getElementById('receiveDiscount')?.value)));document.getElementById('receiveMrp').textContent=money(p?.sell||0);document.getElementById('receivePurchase').textContent=money(num(p?.sell)*(1-pct/100))}
 function addLine(){if(!kmRequireRole('admin'))return;
@@ -378,7 +398,7 @@ function saveBill(){if(!kmRequireRole('admin')||isSavingBill)return;
  if(!outletId){alert('Please select an outlet before creating an invoice.');return}
  if(!cart.length){alert('Please add products to the invoice first.');return}
  isSavingBill=true;const saveButton=document.querySelector('#invoice button[onclick="saveBill()"]');if(saveButton){saveButton.disabled=true;saveButton.textContent='Saving…';}
- const t=billTotals(),add=Math.max(0,num(document.getElementById('extra').value));
+ try{const t=billTotals(),add=Math.max(0,num(document.getElementById('extra').value));
  const items=cart.map(x=>{
   const qty=num(x.qty),price=num(x.price),fixedPrice=!!x.fixedPrice,discountPct=fixedPrice?0:Math.max(0,Math.min(100,num(x.discountPct))),discountFixed=fixedPrice?0:Math.max(0,num(x.discountFixed));
   const lineGross=qty*price,discountAmount=fixedPrice?0:Math.min(lineGross,lineGross*discountPct/100+discountFixed*qty);
@@ -391,7 +411,9 @@ function saveBill(){if(!kmRequireRole('admin')||isSavingBill)return;
  if(activeOrderId){const linkedOrder=db.orders.find(o=>Number(o.id)===Number(activeOrderId));if(linkedOrder){linkedOrder.status='Billed';linkedOrder.invoiceNo=invoiceNo;linkedOrder.billedAt=new Date().toISOString();kmFirestore.collection('orders').doc(String(activeOrderId)).set({status:'Billed',invoiceNo,billedAt:new Date().toISOString()},{merge:true}).catch(e=>console.error('Order status sync failed',e));}activeOrderId=null;}
 
  cart=[];document.getElementById('extra').value='0';document.getElementById('billNote').value='';document.getElementById('billDiscountPct').value='0';document.getElementById('billDiscountAmt').value='0';
- renderCart();persist();tab('history');alert('Invoice saved. Invoice No: '+invoiceNo);isSavingBill=false;if(saveButton){saveButton.disabled=false;saveButton.textContent='Save Invoice';}
+ renderCart();persist();tab('history');alert('Invoice saved. Invoice No: '+invoiceNo);
+ }catch(e){alert(e.message||'Invoice could not be saved.');}
+ finally{isSavingBill=false;if(saveButton){saveButton.disabled=false;saveButton.textContent='Save Invoice';}}
 }
 let editingLedgerId=null;
 function ledgerDateInput(value){const d=new Date(value);if(!Number.isFinite(d.getTime()))return '';const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;}
