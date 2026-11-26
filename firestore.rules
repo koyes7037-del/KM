@@ -12,11 +12,12 @@ service cloud.firestore {
     }
     function isAdmin() { return hasRole('admin'); }
     function isEmployee() { return hasRole('employee'); }
+    function isDealer() { return hasRole('dealer'); }
 
     // Main KM data: employees can view shared product/outlet information;
     // only Admin can change billing, products, outlets, settings and reports.
     match /appData/{documentId} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || (documentId == 'shared' && isDealer());
       allow write: if isAdmin();
     }
 
@@ -27,6 +28,10 @@ service cloud.firestore {
         || (isEmployee()
           && resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route);
       allow write: if isAdmin();
+    }
+
+    match /dealerData/{uid} {
+      allow read, write: if isDealer() && request.auth.uid == uid;
     }
 
     match /orders/{orderId} {
