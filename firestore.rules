@@ -58,7 +58,7 @@ service cloud.firestore {
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.billId is string
         && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.name == request.resource.data.employee
-        && get(/databases/$(database)/documents/appData/shared).data.payload.deliveryAssignments[request.resource.data.billId] == request.resource.data.employee;
+        && get(/databases/$(database)/documents/employeeData/$(get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route)).data.payload.deliveryAssignments[request.resource.data.billId] == request.resource.data.employee;
       allow read: if isAdmin()
         || (isEmployee() && resource.data.createdBy == request.auth.uid);
       allow update, delete: if isAdmin();
