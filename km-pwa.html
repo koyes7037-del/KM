@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#14532d">
 <title>Valuation</title>
 <style>
-:root{--green:#14532d;--green2:#198754;--bg:#f3f6f4;--line:#dce5df;--ink:#17231b}
+:root{--green:#14532d;--green2:#198754;--bg:#eeeeef;--line:#dce5df;--ink:#17231b}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--ink)}
 header{background:var(--green);color:white;padding:18px 16px;position:sticky;top:0;z-index:2}
 h1{font-size:24px;margin:0;font-weight:800;letter-spacing:.4px}header p{margin:4px 0 0;font-size:13px;opacity:.9}
@@ -64,7 +64,11 @@ button{cursor:pointer}
   .account-current strong{font-size:16px}
   .stat strong{font-size:17px}
 }
-.home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.shortcut{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 4px;text-align:center;color:var(--ink);font-weight:650}.shortcut .ico{display:flex;align-items:center;justify-content:center;margin-bottom:6px}.shortcut .ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.shortcut span:last-child{font-size:12px}.progress-track{height:10px;background:#e8eee9;border-radius:20px;overflow:hidden}.progress-fill{height:100%;background:#198754}@media(max-width:520px){.home-shortcuts{gap:6px}.shortcut{padding:9px 2px}.shortcut .ico svg{width:23px;height:23px}.shortcut span:last-child{font-size:10px}}</style>
+.home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.shortcut{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 4px;text-align:center;color:var(--ink);font-weight:650}.shortcut .ico{display:flex;align-items:center;justify-content:center;margin-bottom:6px}.shortcut .ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.shortcut span:last-child{font-size:12px}.progress-track{height:10px;background:#e8eee9;border-radius:20px;overflow:hidden}.progress-fill{height:100%;background:#198754}@media(max-width:520px){.home-shortcuts{gap:6px}.shortcut{padding:9px 2px}.shortcut .ico svg{width:23px;height:23px}.shortcut span:last-child{font-size:10px}}
+/* App-wide soft light-grey background */
+html,body{background:#eeeeef!important}
+main{background:transparent!important}
+</style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
