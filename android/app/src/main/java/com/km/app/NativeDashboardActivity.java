@@ -124,6 +124,10 @@ public class NativeDashboardActivity extends Activity {
             startActivity(new Intent(this, NativePartyActivity.class));
             return;
         }
+        if ("Slab".equals(name)) {
+            startActivity(new Intent(this, NativeSlabActivity.class));
+            return;
+        }
         currentPage = name;
         base(name);
 
