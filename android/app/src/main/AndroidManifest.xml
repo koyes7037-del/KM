@@ -8,6 +8,10 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <activity
+            android:name=".NativeLoginActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".NativeDashboardActivity"
             android:exported="false" />
 
