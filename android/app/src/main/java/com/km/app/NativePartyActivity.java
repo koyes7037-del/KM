@@ -138,15 +138,114 @@ public class NativePartyActivity extends Activity {
             Map<String,Object> update = new HashMap<>(); update.put("payload",payload);
             update.put("updatedAt",new Date().toString());
             store.collection("appData").document("main").set(update)
-                .addOnSuccessListener(this, unused -> {
-                    save.setEnabled(true); status.setText("দোকান সংরক্ষিত হয়েছে।");
-                    loadOutlets();
-                }).addOnFailureListener(this,e -> {
+                .addOnSuccessListener(this, unused -> publishEmployeeViews(payload, save))
+                .addOnFailureListener(this,e -> {
                     save.setEnabled(true); status.setText("সংরক্ষণ হয়নি: "+e.getLocalizedMessage());
                 });
         }).addOnFailureListener(this,e -> {
             save.setEnabled(true); status.setText("Cloud ডেটা পড়া যায়নি।");
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void publishEmployeeViews(Map<String,Object> payload, Button save) {
+        List<Object> allOutlets = payload.get("outlets") instanceof List
+            ? (List<Object>)payload.get("outlets") : new ArrayList<>();
+        List<Object> products = payload.get("products") instanceof List
+            ? (List<Object>)payload.get("products") : new ArrayList<>();
+        List<Object> allEmployees = payload.get("employees") instanceof List
+            ? (List<Object>)payload.get("employees") : new ArrayList<>();
+        List<Object> allBills = payload.get("bills") instanceof List
+            ? (List<Object>)payload.get("bills") : new ArrayList<>();
+        List<Object> safeBills = new ArrayList<>();
+        Map<String,Object> allAssignments = new HashMap<>();
+        for (Object item : allBills) {
+            if (!(item instanceof Map)) continue;
+            Map<String,Object> bill = (Map<String,Object>)item;
+            Map<String,Object> safe = new HashMap<>();
+            for (String key : new String[]{"id","invoiceNo","date","outletId","outletName","employee","deliveryStatus","orderId","deliveredAt"})
+                if (bill.containsKey(key)) safe.put(key,bill.get(key));
+            if (!safe.containsKey("invoiceNo")) safe.put("invoiceNo","");
+            if (!safe.containsKey("date")) safe.put("date","");
+            if (!safe.containsKey("outletName")) safe.put("outletName","");
+            if (!safe.containsKey("employee")) safe.put("employee","");
+            if (!safe.containsKey("deliveryStatus")) safe.put("deliveryStatus","Pending");
+            if (!safe.containsKey("orderId")) safe.put("orderId",null);
+            if (!safe.containsKey("deliveredAt")) safe.put("deliveredAt",null);
+            safeBills.add(safe);
+            String employee = String.valueOf(bill.get("employee") == null ? "" : bill.get("employee"));
+            String delivery = String.valueOf(bill.get("deliveryStatus") == null ? "Pending" : bill.get("deliveryStatus"));
+            if (!employee.isEmpty() && !"Delivered".equals(delivery))
+                allAssignments.put(String.valueOf(bill.get("id")), employee);
+        }
+        List<Object> safeEmployees = new ArrayList<>();
+        for (Object item : allEmployees) {
+            if (!(item instanceof Map)) continue;
+            Map<String,Object> employee = (Map<String,Object>)item;
+            Map<String,Object> safe = new HashMap<>();
+            for (String key : new String[]{"id","name","route","target"})
+                if (employee.containsKey(key)) safe.put(key,employee.get(key));
+            safeEmployees.add(safe);
+        }
+        Map<String,Object> shared = new HashMap<>();
+        shared.put("outlets",allOutlets); shared.put("products",products);
+        shared.put("employees",safeEmployees); shared.put("bills",safeBills);
+        shared.put("deliveryAssignments",allAssignments); shared.put("shop","KM");
+        shared.put("language",payload.get("language") == null ? "en" : payload.get("language"));
+        Map<String,Object> sharedDoc = new HashMap<>();
+        sharedDoc.put("payload",shared); sharedDoc.put("updatedAt",new Date().toString());
+
+        java.util.Set<String> routes = new java.util.LinkedHashSet<>();
+        for (Object item : allOutlets) if (item instanceof Map) {
+            Object route = ((Map<String,Object>)item).get("route");
+            if (route != null && !String.valueOf(route).isEmpty()) routes.add(String.valueOf(route));
+        }
+        for (Object item : allEmployees) if (item instanceof Map) {
+            Object route = ((Map<String,Object>)item).get("route");
+            if (route != null && !String.valueOf(route).isEmpty()) routes.add(String.valueOf(route));
+        }
+        List<com.google.android.gms.tasks.Task<Void>> writes = new ArrayList<>();
+        writes.add(store.collection("appData").document("shared").set(sharedDoc));
+        for (String route : routes) {
+            List<Object> routeOutlets = new ArrayList<>(), routeEmployees = new ArrayList<>(), routeBills = new ArrayList<>();
+            java.util.Set<String> employeeNames = new java.util.HashSet<>();
+            for (Object item : allOutlets) if (item instanceof Map) {
+                Map<String,Object> o = (Map<String,Object>)item;
+                if (route.equals(String.valueOf(o.get("route")))) routeOutlets.add(o);
+            }
+            for (Object item : allEmployees) if (item instanceof Map) {
+                Map<String,Object> e = (Map<String,Object>)item;
+                if (route.equals(String.valueOf(e.get("route")))) {
+                    routeEmployees.add(e);
+                    if (e.get("name") != null) employeeNames.add(String.valueOf(e.get("name")));
+                }
+            }
+            Map<String,Object> assignments = new HashMap<>();
+            for (Object item : safeBills) if (item instanceof Map) {
+                Map<String,Object> bill = (Map<String,Object>)item;
+                String employee = String.valueOf(bill.get("employee"));
+                if (employeeNames.contains(employee)) {
+                    routeBills.add(bill);
+                    if (!"Delivered".equals(String.valueOf(bill.get("deliveryStatus"))))
+                        assignments.put(String.valueOf(bill.get("id")),employee);
+                }
+            }
+            Map<String,Object> routePayload = new HashMap<>();
+            routePayload.put("route",route); routePayload.put("outlets",routeOutlets);
+            routePayload.put("products",products); routePayload.put("employees",routeEmployees);
+            routePayload.put("bills",routeBills); routePayload.put("deliveryAssignments",assignments);
+            routePayload.put("shop","KM"); routePayload.put("language",shared.get("language"));
+            Map<String,Object> routeDoc = new HashMap<>();
+            routeDoc.put("route",route); routeDoc.put("payload",routePayload); routeDoc.put("updatedAt",new Date().toString());
+            writes.add(store.collection("employeeData").document(route).set(routeDoc));
+        }
+        com.google.android.gms.tasks.Tasks.whenAll(writes)
+            .addOnSuccessListener(this, result -> {
+                save.setEnabled(true); status.setText("দোকান সংরক্ষিত ও Route-এ Sync হয়েছে।");
+                loadOutlets();
+            }).addOnFailureListener(this, error -> {
+                save.setEnabled(true); status.setText("দোকান সংরক্ষিত, তবে Route Sync অসম্পূর্ণ: "+error.getLocalizedMessage());
+            });
     }
 
     @SuppressWarnings("unchecked")
