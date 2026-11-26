@@ -64,7 +64,7 @@ button{cursor:pointer}
   .account-current strong{font-size:16px}
   .stat strong{font-size:17px}
 }
-.home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.shortcut{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 4px;text-align:center;color:var(--ink);font-weight:650}.shortcut .ico{display:flex;align-items:center;justify-content:center;margin-bottom:6px}.shortcut .ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.shortcut span:last-child{font-size:12px}.progress-track{height:10px;background:#e8eee9;border-radius:20px;overflow:hidden}.progress-fill{height:100%;background:#198754}@media(max-width:520px){.home-shortcuts{gap:6px}.shortcut{padding:9px 2px}.shortcut .ico svg{width:23px;height:23px}.shortcut span:last-child{font-size:10px}}
+.home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.shortcut{border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px 4px;text-align:center;color:var(--ink);font-weight:650}.shortcut .ico{display:flex;align-items:center;justify-content:center;margin-bottom:6px}.shortcut .ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.shortcut span:last-child{font-size:12px}.progress-track{height:10px;background:#e8eee9;border-radius:20px;overflow:hidden}.progress-fill{height:100%;background:#198754}@media(max-width:520px){.home-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.shortcut{padding:13px 5px;min-height:88px}.shortcut .ico svg{width:29px;height:29px}.shortcut span:last-child{font-size:12px}}
 /* App-wide soft light-grey background */
 html,body{background:#eeeeef!important}
 main{background:transparent!important}
@@ -83,7 +83,7 @@ body{padding-bottom:0!important}
 #kmSyncStatus{margin:0 auto 0 0;min-width:0}
 #kmAccountBar button{flex:0 0 auto;white-space:nowrap}
 .home-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media(max-width:520px){.home-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.shortcut{min-width:0;padding:10px 2px}.shortcut span:last-child{font-size:11px;overflow-wrap:anywhere}}
+@media(max-width:520px){.home-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.shortcut{min-width:0;padding:13px 5px;min-height:88px}.shortcut span:last-child{font-size:12px;overflow-wrap:anywhere}}
 </style>
 
 <style>
@@ -95,6 +95,20 @@ main{background:transparent!important}
 .home-shortcuts .shortcut{background:#f7f7f8!important;border-color:#d7d7dc!important;box-shadow:0 2px 8px #2021260c!important}
 #kmAuthGate{background:#f5f5f6!important;border-color:#d7d7dc!important}
 #kmAccountBar{background:#f3f3f4!important;border-color:#d7d7dc!important}
+
+/* Dashboard design aligned with the approved Valuation mockup */
+.dashboard-card{padding:16px!important}
+.dashboard-brand{display:flex;align-items:center;gap:12px;margin:0 0 17px;padding:2px 2px 13px;border-bottom:1px solid #dedee3}
+.dashboard-brand h2{font-size:22px;margin:0 0 3px;color:#202126}
+.dashboard-brand p{font-size:12px;margin:0;color:#70717a}
+.brand-mark{width:46px;height:46px;border-radius:14px;background:#e5eaf4;color:#345b9b;display:flex;align-items:center;justify-content:center}
+.brand-mark svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.home-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important}
+.home-shortcuts .shortcut{min-height:94px;padding:13px 5px;border-radius:15px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#30333b!important}
+.home-shortcuts .shortcut .ico{width:43px;height:43px;border-radius:13px;background:#e9edf5;color:#365b96;margin:0;display:flex;align-items:center;justify-content:center}
+.home-shortcuts .shortcut .ico svg{width:25px;height:25px}
+.home-shortcuts .shortcut span:last-child{font-size:12px!important;font-weight:700;line-height:1.3}
+@media(max-width:360px){.home-shortcuts{gap:7px!important}.home-shortcuts .shortcut{min-height:86px;padding:10px 2px}.home-shortcuts .shortcut .ico{width:38px;height:38px}}
 </style>
 </head>
 <body class="auth-locked">
@@ -131,24 +145,17 @@ body.auth-locked>main>.panel:not(#settings){display:none!important}
 </nav>
 <main>
 <section id="home" class="panel active">
-<div class="card"><h2>Valuation Dashboard</h2><div class="home-shortcuts">
-<button class="shortcut" onclick="tab('invoice')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-receipt"></use></svg></span><span>New Bill</span></button>
-<button class="shortcut" onclick="tab('outlets')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-store"></use></svg></span><span>Outlets</span></button>
-<button class="shortcut" onclick="tab('products')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-box"></use></svg></span><span>Products</span></button>
-<button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-truck"></use></svg></span><span>Delivery</span></button>
-<button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-target"></use></svg></span><span>Targets</span></button>
-<button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-route"></use></svg></span><span>Routes</span></button>
-<button class="shortcut" onclick="tab('history')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-chart"></use></svg></span><span>Reports</span></button><button class="shortcut" onclick="tab('dealerReport');loadDealerPurchaseReport()"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-box"></use></svg></span><span>Dealer Purchases</span></button>
-<button class="shortcut" onclick="tab('settings')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-settings"></use></svg></span><span>Settings</span></button>
-<button class="shortcut" onclick="tab('home')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-home"></use></svg></span><span>Dashboard</span></button>
-<button class="shortcut" onclick="tab('outlets')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-store"></use></svg></span><span>Party / Shop</span></button>
-<button class="shortcut" onclick="tab('slabs')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-gift"></use></svg></span><span>Slab</span></button>
-<button class="shortcut" onclick="tab('products')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-box"></use></svg></span><span>Products</span></button>
-<button class="shortcut" onclick="tab('orders')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-cart"></use></svg></span><span>Orders</span></button>
-
-<button class="shortcut" onclick="tab('history')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-file"></use></svg></span><span>Bill History</span></button>
-<button class="shortcut" onclick="tab('operations')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-truck"></use></svg></span><span>Route &amp; Target</span></button>
-<button class="shortcut" onclick="tab('settings')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-settings"></use></svg></span><span>Settings</span></button></div></div><div class="grid">
+<div class="card dashboard-card"><div class="dashboard-brand"><div class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#km-chart"></use></svg></div><div><h2>Valuation</h2><p>স্মার্ট সেলস ও হিসাব ব্যবস্থাপনা</p></div></div><div class="home-shortcuts">
+<button class="shortcut" onclick="tab('invoice')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-receipt"></use></svg></span><span>নতুন বিল</span></button>
+<button class="shortcut" onclick="tab('history')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-file"></use></svg></span><span>বিলের তালিকা</span></button>
+<button class="shortcut" onclick="tab('history')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-chart"></use></svg></span><span>বিক্রির রিপোর্ট</span></button>
+<button class="shortcut" onclick="tab('outlets')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-store"></use></svg></span><span>পার্টি তালিকা</span></button>
+<button class="shortcut" onclick="tab('outlets')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-target"></use></svg></span><span>বকেয়া ও জমা</span></button>
+<button class="shortcut" onclick="tab('slabs')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-gift"></use></svg></span><span>স্লাবের হিসাব</span></button>
+<button class="shortcut" onclick="tab('products')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-box"></use></svg></span><span>MRP এডিট</span></button>
+<button class="shortcut" onclick="tab('orders')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-cart"></use></svg></span><span>অর্ডার</span></button>
+<button class="shortcut" onclick="tab('settings')"><span class="ico"><svg viewBox="0 0 24 24"><use href="#km-settings"></use></svg></span><span>সেটিংস</span></button>
+</div></div></div><div class="grid">
 <div class="stat"><small>Total Products</small><strong id="countProducts">0</strong></div>
 <div class="stat"><small>Total Invoices</small><strong id="countBills">0</strong></div>
 <div class="stat"><small>Today's Sales</small><strong id="todaySales">৳0</strong></div>
