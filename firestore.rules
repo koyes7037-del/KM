@@ -31,7 +31,8 @@ service cloud.firestore {
     }
 
     match /dealerData/{uid} {
-      allow read, write: if isDealer() && request.auth.uid == uid;
+      allow read: if isAdmin() || (isDealer() && request.auth.uid == uid);
+      allow write: if isDealer() && request.auth.uid == uid;
     }
 
     match /orders/{orderId} {
