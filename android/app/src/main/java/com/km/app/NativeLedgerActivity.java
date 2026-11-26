@@ -133,7 +133,7 @@ public class NativeLedgerActivity extends Activity {
             double a=num(amount.getText().toString());String dt=date.getText().toString().trim();
             if(a<=0||!dt.matches("\\d{4}-\\d{2}-\\d{2}")){status.setText("Amount ও Date সঠিকভাবে দিন।");return;}
             String[] parts=dt.split("-");Calendar c=Calendar.getInstance();c.set(Integer.parseInt(parts[0]),Integer.parseInt(parts[1])-1,Integer.parseInt(parts[2]),12,0,0);c.set(Calendar.MILLISECOND,0);
-            selected.put("amount","Payment Received".equals(selected.get("type"))?-a:a);selected.put("date",new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",Locale.US).format(c.getTime()));selected.put("note",note.getText().toString().trim());saveLedger("লেনদেন Edit হয়েছে; বকেয়া পুনরায় হিসাব করা হয়েছে।");
+            selected.put("amount","Payment Received".equals(selected.get("type"))?-a:a);SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",Locale.US);df.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));selected.put("date",df.format(c.getTime()));selected.put("note",note.getText().toString().trim());saveLedger("লেনদেন Edit হয়েছে; বকেয়া পুনরায় হিসাব করা হয়েছে।");
         }).show();
     }
 }
