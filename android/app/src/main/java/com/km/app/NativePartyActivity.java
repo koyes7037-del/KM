@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 public class NativePartyActivity extends Activity {
     private static final int BG = Color.rgb(230,221,242);
@@ -135,7 +136,7 @@ public class NativePartyActivity extends Activity {
             outlet.put("route",route.isEmpty()?"None":route); outlet.put("enteredBy","");
             outlets.add(outlet); payload.put("outlets",outlets);
             Map<String,Object> update = new HashMap<>(); update.put("payload",payload);
-            update.put("updatedAt",java.time.Instant.now().toString());
+            update.put("updatedAt",new Date().toString());
             store.collection("appData").document("main").set(update)
                 .addOnSuccessListener(this, unused -> {
                     save.setEnabled(true); status.setText("দোকান সংরক্ষিত হয়েছে।");
