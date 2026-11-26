@@ -30,8 +30,8 @@ public class MainActivity extends Activity {
         super.onCreate(state);
 
         Window window = getWindow();
-        window.setStatusBarColor(Color.rgb(230, 221, 242));
-        window.setNavigationBarColor(Color.rgb(230, 221, 242));
+        window.setStatusBarColor(Color.rgb(238, 238, 239));
+        window.setNavigationBarColor(Color.rgb(238, 238, 239));
         int flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
