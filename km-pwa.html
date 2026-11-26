@@ -236,7 +236,7 @@ let db=JSON.parse(localStorage.getItem(KEY)||'{"products":[],"bills":[],"shop":"
 db.outlets=Array.isArray(db.outlets)?db.outlets:[];
 db.slabs=Array.isArray(db.slabs)?db.slabs:[];
 db.ledger=Array.isArray(db.ledger)?db.ledger:[];db.employees=Array.isArray(db.employees)?db.employees:[];db.orders=Array.isArray(db.orders)?db.orders:[];db.language=db.language||'en';db.bills.forEach(b=>{if(!b.deliveryStatus)b.deliveryStatus='Pending'});
-let cart=[];let orderCart=[];let activeOrderId=null;db.receives=Array.isArray(db.receives)?db.receives:[];db.priceHistory=Array.isArray(db.priceHistory)?db.priceHistory:[];
+let cart=[];let orderCart=[];let activeOrderId=null;let isSavingBill=false;db.receives=Array.isArray(db.receives)?db.receives:[];db.priceHistory=Array.isArray(db.priceHistory)?db.priceHistory:[];
 const num=v=>{const n=Number.parseFloat(String(v??'').replace(/,/g,''));return Number.isFinite(n)?n:0};
 const money=n=>'৳'+num(n).toLocaleString('en-BD',{minimumFractionDigits:0,maximumFractionDigits:2});
 function kmSetSyncStatus(message,isError=false){const el=document.getElementById('kmSyncStatus');if(el){el.textContent=message;el.style.color=isError?'#b42318':'#526257';}const dashboard=document.getElementById('kmDashboardSync');if(dashboard)dashboard.textContent=message;}
@@ -373,10 +373,11 @@ function updateAccountSummary(){
  document.getElementById('totalOutstanding').textContent=money(previous+current);
  document.getElementById('grandTotal').textContent=money(current);
 }
-function saveBill(){if(!kmRequireRole('admin'))return;
+function saveBill(){if(!kmRequireRole('admin')||isSavingBill)return;
  const outletId=num(document.getElementById('billOutlet').value);
  if(!outletId){alert('Please select an outlet before creating an invoice.');return}
  if(!cart.length){alert('Please add products to the invoice first.');return}
+ isSavingBill=true;const saveButton=document.querySelector('#invoice button[onclick="saveBill()"]');if(saveButton){saveButton.disabled=true;saveButton.textContent='Saving…';}
  const t=billTotals(),add=Math.max(0,num(document.getElementById('extra').value));
  const items=cart.map(x=>{
   const qty=num(x.qty),price=num(x.price),fixedPrice=!!x.fixedPrice,discountPct=fixedPrice?0:Math.max(0,Math.min(100,num(x.discountPct))),discountFixed=fixedPrice?0:Math.max(0,num(x.discountFixed));
@@ -390,7 +391,7 @@ function saveBill(){if(!kmRequireRole('admin'))return;
  if(activeOrderId){const linkedOrder=db.orders.find(o=>Number(o.id)===Number(activeOrderId));if(linkedOrder){linkedOrder.status='Billed';linkedOrder.invoiceNo=invoiceNo;linkedOrder.billedAt=new Date().toISOString();kmFirestore.collection('orders').doc(String(activeOrderId)).set({status:'Billed',invoiceNo,billedAt:new Date().toISOString()},{merge:true}).catch(e=>console.error('Order status sync failed',e));}activeOrderId=null;}
 
  cart=[];document.getElementById('extra').value='0';document.getElementById('billNote').value='';document.getElementById('billDiscountPct').value='0';document.getElementById('billDiscountAmt').value='0';
- renderCart();persist();tab('history');alert('Invoice saved. Invoice No: '+invoiceNo);
+ renderCart();persist();tab('history');alert('Invoice saved. Invoice No: '+invoiceNo);isSavingBill=false;if(saveButton){saveButton.disabled=false;saveButton.textContent='Save Invoice';}
 }
 let editingLedgerId=null;
 function ledgerDateInput(value){const d=new Date(value);if(!Number.isFinite(d.getTime()))return '';const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;}
