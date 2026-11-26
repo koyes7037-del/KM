@@ -445,6 +445,7 @@ if(roleData.role==='dealer'){kmUnsubs.push(kmFirestore.collection('appData').doc
 const kmFirebaseConfig={apiKey:"AIzaSyAYv3-rtCaCuZPD0jK-jeYwA_3Ys7Ittyc",authDomain:"km-wholesale-7dbb4.firebaseapp.com",projectId:"km-wholesale-7dbb4",storageBucket:"km-wholesale-7dbb4.firebasestorage.app",messagingSenderId:"1002111574436",appId:"1:1002111574436:web:16e7b339a9da923ea3e131"};
 let kmAuth=null,kmFirestore=null,kmCurrentRole=null;
 render();renderOperations();renderCart();updateAccountSummary();applyLanguage();
+document.getElementById('receiveProduct')?.addEventListener('change',updateReceivePreview);document.getElementById('receiveDiscount')?.addEventListener('input',updateReceivePreview);
 function kmRequireRole(role){if(kmCurrentRole!==role){alert(role==='admin'?'Admin access required.':role==='dealer'?'Dealer access required.':'Employee access required.');return false;}return true;}
 function kmShowMessage(message){const el=document.getElementById('kmAuthMessage');if(el)el.textContent=message;}
 async function kmSignIn(){const email=document.getElementById('kmLoginEmail').value.trim(),password=document.getElementById('kmLoginPassword').value;if(!email||!password){kmShowMessage('Enter your email and password.');return;}const b=document.getElementById('kmLoginButton');b.disabled=true;b.textContent='Signing in...';try{await kmAuth.signInWithEmailAndPassword(email,password);}catch(e){kmShowMessage(e.code==='auth/invalid-credential'?'Email or password is incorrect.':e.message||'Sign in failed.');}finally{b.disabled=false;b.textContent='Sign In';}}
