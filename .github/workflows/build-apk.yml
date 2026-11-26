@@ -34,14 +34,11 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const html = fs.readFileSync('km-pwa.html', 'utf8');
-          const chunks = html.split('<script');
-          if (chunks.length < 2) throw new Error('No inline JavaScript found');
+          const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
+          if (!scripts.length) throw new Error('No inline JavaScript found');
           let count = 0;
-          for (const chunk of chunks.slice(1)) {
-            const start = chunk.indexOf('>');
-            const end = chunk.indexOf('</script>');
-            if (start < 0 || end < 0) continue;
-            const code = chunk.slice(start + 1, end);
+          for (const match of scripts) {
+            const code = match[1];
             if (code.trim()) { new Function(code); count++; }
           }
           console.log('Validated ' + count + ' JavaScript block(s).');
