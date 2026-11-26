@@ -88,7 +88,7 @@ public class NativeSlabActivity extends Activity {
     private void buildForm(){
         form.removeAllViews();form.addView(text("নতুন Gift Slab তৈরি করুন",17,true));
         outletSpinner=new Spinner(this);List<String> names=new ArrayList<>();for(Map<String,Object> o:outlets)names.add(String.valueOf(o.get("name"))+"  •  "+String.valueOf(o.get("id")));
-        outletSpinner.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,names));addField("Outlet নির্বাচন",new EditText(this));
+        outletSpinner.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,names));
         form.addView(outletSpinner,new LinearLayout.LayoutParams(-1,dp(48)));
         startField=field("শুরুর তারিখ",InputType.TYPE_CLASS_TEXT);dateField("Slab Start Date",startField);
         endField=field("শেষ তারিখ",InputType.TYPE_CLASS_TEXT);dateField("Slab End Date",endField);
