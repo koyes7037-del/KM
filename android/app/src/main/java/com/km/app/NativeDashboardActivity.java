@@ -128,6 +128,10 @@ public class NativeDashboardActivity extends Activity {
             startActivity(new Intent(this, NativeSlabActivity.class));
             return;
         }
+        if ("বকেয়া / Ledger".equals(name)) {
+            startActivity(new Intent(this, NativeLedgerActivity.class));
+            return;
+        }
         currentPage = name;
         base(name);
 
