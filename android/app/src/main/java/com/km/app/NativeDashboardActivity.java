@@ -1,6 +1,7 @@
 package com.km.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -119,6 +120,10 @@ public class NativeDashboardActivity extends Activity {
 
     private void openModule(String name) {
         if ("Dashboard".equals(name)) return;
+        if ("Party / Shop".equals(name)) {
+            startActivity(new Intent(this, NativePartyActivity.class));
+            return;
+        }
         currentPage = name;
         base(name);
 
