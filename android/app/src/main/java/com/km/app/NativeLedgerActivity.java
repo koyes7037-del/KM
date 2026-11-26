@@ -84,6 +84,7 @@ public class NativeLedgerActivity extends Activity {
         }).addOnFailureListener(this,e->status.setText("Ledger লোড হয়নি: "+e.getLocalizedMessage()));
     }
     @SuppressWarnings("unchecked") private void copyMaps(Object source,List<Map<String,Object>> target){if(source instanceof List)for(Object x:(List<?>)source)if(x instanceof Map)target.add(new HashMap<>((Map<String,Object>)x));}
+    private String isoNow(){java.text.SimpleDateFormat f=new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",Locale.US);f.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));return f.format(new Date());}
     private double num(Object x){try{return Double.parseDouble(String.valueOf(x));}catch(Exception e){return 0;}}
     private long id(Object x){try{return (long)Double.parseDouble(String.valueOf(x));}catch(Exception e){return 0;}}
     private double due(long outletId){
@@ -95,7 +96,7 @@ public class NativeLedgerActivity extends Activity {
         if(outlets.isEmpty()||outletSpinner.getSelectedItemPosition()<0){status.setText("আগে Party / Shop-এ দোকান যোগ করুন।");return;}
         double amount=num(amountField.getText().toString());if(amount<=0){status.setText("শূন্যের বেশি সঠিক Amount দিন।");return;}
         Map<String,Object> o=outlets.get(outletSpinner.getSelectedItemPosition());long outletId=id(o.get("id"));
-        Map<String,Object> e=new HashMap<>();e.put("id",System.currentTimeMillis());e.put("outletId",outletId);e.put("outletName",String.valueOf(o.get("name")));e.put("date",new Date().toISOString());e.put("amount",addDue?amount:-amount);e.put("type",addDue?"Due Added":"Payment Received");e.put("note",noteField.getText().toString().trim());
+        Map<String,Object> e=new HashMap<>();e.put("id",System.currentTimeMillis());e.put("outletId",outletId);e.put("outletName",String.valueOf(o.get("name")));e.put("date",isoNow());e.put("amount",addDue?amount:-amount);e.put("type",addDue?"Due Added":"Payment Received");e.put("note",noteField.getText().toString().trim());
         ledger.add(0,e);saveLedger(addDue?"বকেয়া যোগ হয়েছে।":"জমা গ্রহণ করা হয়েছে।");
     }
     private void saveLedger(String success){
