@@ -20,6 +20,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".NativeLedgerActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".NativeDashboardActivity"
             android:exported="false" />
 
