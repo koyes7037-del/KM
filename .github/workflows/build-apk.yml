@@ -1,9 +1,9 @@
 name: Build KM APK
-# Rebuild for the latest Valuation grey-background update
+# Build the Valuation Android APK for main and native migration branches
 
 on:
   push:
-    branches: [main]
+    branches: [main, native-migration]
     paths:
       - 'km-pwa.html'
       - 'android/**'
