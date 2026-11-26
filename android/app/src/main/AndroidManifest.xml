@@ -16,6 +16,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".NativeSlabActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".NativeDashboardActivity"
             android:exported="false" />
 
