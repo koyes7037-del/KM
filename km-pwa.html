@@ -218,7 +218,10 @@ const num=v=>{const n=Number.parseFloat(String(v??'').replace(/,/g,''));return N
 const money=n=>'৳'+num(n).toLocaleString('en-BD',{minimumFractionDigits:0,maximumFractionDigits:2});
 function kmSetSyncStatus(message,isError=false){const el=document.getElementById('kmSyncStatus');if(el){el.textContent=message;el.style.color=isError?'#b42318':'#526257';}}
 function persist(){localStorage.setItem(KEY,JSON.stringify(db));render();renderOperations();applyLanguage();if(kmCurrentRole==='admin'&&!kmApplyingRemote){kmSetSyncStatus('Saving…');kmSaveSharedData().then(()=>kmSetSyncStatus('Cloud synced')).catch(e=>{kmSetSyncStatus('Sync failed',true);console.error('KM cloud save failed',e);});}}
-function tab(id){if(kmCurrentRole==='employee'&&!['home','outlets','orders','operations'].includes(id)){alert('Admin access required.');return;}document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
+let kmCurrentTab='home';
+function tab(id,fromHistory=false){if(kmCurrentRole==='employee'&&!['home','outlets','orders','operations'].includes(id)){alert('Admin access required.');return;}if(!fromHistory&&id!==kmCurrentTab){try{history.pushState({kmTab:id},'', '#'+id);}catch(e){}}kmCurrentTab=id;document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));}
+try{history.replaceState({kmTab:'home'},'','#home');}catch(e){}
+window.addEventListener('popstate',function(event){const id=event.state&&event.state.kmTab;if(id&&document.getElementById(id)&&document.getElementById(id).classList.contains('panel')){tab(id,true);}else if(document.getElementById('home')){tab('home',true);}});
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 function toggleOtherRoute(){const v=document.getElementById('outRoute').value;document.getElementById('otherRouteWrap').style.display=v==='other'?'block':'none'}
 function routeLabel(v){if(v===undefined||v===null||v===''||v==='None')return 'None';if(String(v).startsWith('Other:'))return String(v).slice(6).trim()||'Other';return String(v).trim()!==''&&!Number.isNaN(Number(v))?'Route '+v:String(v)}
