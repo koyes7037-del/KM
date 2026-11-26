@@ -144,10 +144,33 @@ public class NativeSlabActivity extends Activity {
                 card.addView(text("সময়: "+s.get("startDate")+" থেকে "+s.get("endDate"),12,false));
                 card.addView(text("অগ্রগতি: ৳"+Math.round(current)+" / ৳"+Math.round(target)+"  ("+pct+"%)",14,true));
                 android.widget.ProgressBar bar=new android.widget.ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(100);bar.setProgress(pct);LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(-1,dp(9));bp.topMargin=dp(8);card.addView(bar,bp);
-                Button del=button("Slab মুছুন");card.addView(del);final long id=numberLong(s.get("id"));del.setOnClickListener(v->new AlertDialog.Builder(this).setMessage("এই Slab মুছে ফেলবেন? দোকান, Bill ও Ledger অপরিবর্তিত থাকবে।").setNegativeButton("না",null).setPositiveButton("হ্যাঁ", (a,b)->deleteSlab(id)).show());count++;
+                final long id=numberLong(s.get("id"));
+                Button edit=button("Target / Gift Value পরিবর্তন");card.addView(edit);edit.setOnClickListener(v->editSlab(id,target,gift));
+                Button del=button("Slab মুছুন");card.addView(del);del.setOnClickListener(v->new AlertDialog.Builder(this).setMessage("এই Slab মুছে ফেলবেন? দোকান, Bill ও Ledger অপরিবর্তিত থাকবে।").setNegativeButton("না",null).setPositiveButton("হ্যাঁ", (a,b)->deleteSlab(id)).show());count++;
             }
             if(count==0)list.addView(text("এখনো কোনো Slab তৈরি করা হয়নি।",14,false));
         }).addOnFailureListener(this,e->status.setText("Progress হিসাব করা যায়নি।"));
+    }
+    private void editSlab(long id,double oldTarget,double oldGift){
+        LinearLayout box=new LinearLayout(this);box.setOrientation(1);box.setPadding(dp(12),dp(8),dp(12),0);
+        EditText target=field("Target Amount",InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);target.setText(String.valueOf(oldTarget));box.addView(target);
+        EditText gift=field("Gift Value",InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);gift.setText(String.valueOf(oldGift));LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(-1,dp(49));gp.topMargin=dp(8);box.addView(gift,gp);
+        new AlertDialog.Builder(this).setTitle("Slab Amount Edit").setView(box).setNegativeButton("বাতিল",null).setPositiveButton("সংরক্ষণ",(dialog,which)->{
+            double t=number(target.getText().toString()),g=number(gift.getText().toString());
+            if(t<=0||gift.getText().toString().trim().isEmpty()){status.setText("Target ও Gift Value সঠিক দিন।");return;}
+            updateSlabAmounts(id,t,g);
+        }).show();
+    }
+    @SuppressWarnings("unchecked") private void updateSlabAmounts(long id,double target,double gift){
+        store.collection("appData").document("main").get().addOnSuccessListener(this,snap->{
+            Map<String,Object> payload=snap.exists()&&snap.get("payload") instanceof Map?new HashMap<>((Map<String,Object>)snap.get("payload")):new HashMap<>();
+            List<Object> current=payload.get("slabs") instanceof List?new ArrayList<>((List<Object>)payload.get("slabs")):new ArrayList<>();
+            boolean found=false;
+            for(Object x:current)if(x instanceof Map&&numberLong(((Map<String,Object>)x).get("id"))==id){Map<String,Object> item=new HashMap<>((Map<String,Object>)x);item.put("target",target);item.put("gift",gift);current.set(current.indexOf(x),item);found=true;break;}
+            if(!found){status.setText("Slab পাওয়া যায়নি।");return;}
+            payload.put("slabs",current);Map<String,Object> update=new HashMap<>();update.put("payload",payload);update.put("updatedAt",new Date().toString());
+            store.collection("appData").document("main").set(update).addOnSuccessListener(this,u->{status.setText("Slab-এর Target ও Gift Value আপডেট হয়েছে।");loadData();}).addOnFailureListener(this,e->status.setText("আপডেট হয়নি: "+e.getLocalizedMessage()));
+        }).addOnFailureListener(this,e->status.setText("Cloud ডেটা পড়া যায়নি।"));
     }
     @SuppressWarnings("unchecked") private void deleteSlab(long id){
         store.collection("appData").document("main").get().addOnSuccessListener(this,snap->{
