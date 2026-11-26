@@ -138,7 +138,7 @@ public class NativeSlabActivity extends Activity {
             Map<String,Object> payload=snap.exists()&&snap.get("payload") instanceof Map?(Map<String,Object>)snap.get("payload"):new HashMap<>();
             int count=0;for(Map<String,Object>s:slabs){
                 long oid=numberLong(s.get("outletId"));String shop="দোকান";for(Map<String,Object>o:outlets)if(numberLong(o.get("id"))==oid)shop=String.valueOf(o.get("name"));
-                double current=progress(s,payload),target=number(s.get("target"));int pct=target>0?(int)Math.min(100,Math.round(current*100/target)):0;
+                double current=progress(s,payload),target=number(s.get("target")),gift=number(s.get("gift"));int pct=target>0?(int)Math.min(100,Math.round(current*100/target)):0;
                 LinearLayout card=new LinearLayout(this);card.setOrientation(1);card.setPadding(dp(13),dp(12),dp(13),dp(12));card.setBackground(panel());LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,-2);cp.topMargin=dp(9);list.addView(card,cp);
                 card.addView(text(shop+"  •  "+String.valueOf(s.get("giftName")),16,true));
                 card.addView(text("সময়: "+s.get("startDate")+" থেকে "+s.get("endDate"),12,false));
