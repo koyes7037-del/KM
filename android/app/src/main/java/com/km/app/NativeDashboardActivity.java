@@ -1,6 +1,8 @@
 package com.km.app;
 
 import android.app.Activity;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -8,6 +10,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -90,6 +93,7 @@ public class NativeDashboardActivity extends Activity {
         int screenWidth = getResources().getDisplayMetrics().widthPixels;
         int tileWidth = (screenWidth - dp(32) - dp(20)) / 3;
 
+        int animationIndex = 0;
         for (String[] item : modules) {
             LinearLayout tile = new LinearLayout(this);
             tile.setOrientation(LinearLayout.VERTICAL);
@@ -104,6 +108,15 @@ public class NativeDashboardActivity extends Activity {
             label.setGravity(Gravity.CENTER);
             label.setPadding(dp(2), dp(8), dp(2), 0);
             tile.addView(icon, new LinearLayout.LayoutParams(-1, -2));
+
+            // Keep the tile and layout fixed; only the icon gently floats.
+            ObjectAnimator floatIcon = ObjectAnimator.ofFloat(icon, View.TRANSLATION_Y, 0f, -dp(4), 0f);
+            floatIcon.setDuration(2100);
+            floatIcon.setStartDelay(animationIndex * 110L);
+            floatIcon.setRepeatCount(ValueAnimator.INFINITE);
+            floatIcon.setInterpolator(new AccelerateDecelerateInterpolator());
+            floatIcon.start();
+            animationIndex++;
             tile.addView(label, new LinearLayout.LayoutParams(-1, -2));
 
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
@@ -111,7 +124,11 @@ public class NativeDashboardActivity extends Activity {
             lp.height = dp(108);
             lp.setMargins(dp(3), dp(4), dp(3), dp(7));
             tile.setLayoutParams(lp);
-            tile.setOnClickListener(v -> openModule(item[1]));
+            tile.setOnClickListener(v -> {
+                v.animate().scaleX(0.97f).scaleY(0.97f).setDuration(80)
+                    .withEndAction(() -> v.animate().scaleX(1f).scaleY(1f).setDuration(100).start()).start();
+                v.postDelayed(() -> openModule(item[1]), 90);
+            });
             grid.addView(tile);
         }
         scroll.addView(grid);
