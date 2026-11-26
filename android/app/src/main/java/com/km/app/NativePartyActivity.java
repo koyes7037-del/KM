@@ -61,7 +61,7 @@ public class NativePartyActivity extends Activity {
             if (FirebaseApp.getApps(this).isEmpty()) {
                 FirebaseOptions options = new FirebaseOptions.Builder()
                     .setApiKey("AIzaSyAYv3-rtCaCuZPD0jK-jeYwA_3Ys7Ittyc")
-                    .setApplicationId("1:1002111574436:android:16e7b339a9da923ea3e131")
+                    .setApplicationId("1:1002111574436:web:16e7b339a9da923ea3e131")
                     .setProjectId("km-wholesale-7dbb4")
                     .setGcmSenderId("1002111574436").build();
                 app = FirebaseApp.initializeApp(this, options);
