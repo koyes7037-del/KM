@@ -58,6 +58,7 @@ service cloud.firestore {
         && request.resource.data.items.size() > 0
         && request.resource.data.items.size() <= 100
         && request.resource.data.employee == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.name
+        && request.resource.data.employeeId == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.employeeId
         && request.resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route);
       allow read: if isAdmin()
         || (isEmployee() && resource.data.createdBy == request.auth.uid);
