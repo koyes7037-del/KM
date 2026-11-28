@@ -21,13 +21,25 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Employees may submit only orders attributed to their own signed-in UID.
-    // Each employee can read only the document for their assigned route.
-    match /employeeData/{routeId} {
-      allow read: if isAdmin()
-        || (isEmployee()
-          && resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route);
+    // Employee data is isolated by authenticated employee UID.
+    match /employeeData/{uid} {
+      allow read: if isAdmin() || (isEmployee() && request.auth.uid == uid);
       allow write: if isAdmin();
+    }
+
+    // Each employee maintains their own area and exactly six route names.
+    match /employeeProfiles/{uid} {
+      allow read: if isAdmin() || (isEmployee() && request.auth.uid == uid);
+      allow create, update: if isEmployee()
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.name == get(/databases/$(database)/documents/userRoles/$(uid)).data.name
+        && request.resource.data.employeeId == get(/databases/$(database)/documents/userRoles/$(uid)).data.employeeId
+        && request.resource.data.areaName is string
+        && request.resource.data.areaName.size() > 0
+        && request.resource.data.routes is list
+        && request.resource.data.routes.size() == 6;
+      allow delete: if isAdmin();
     }
 
     match /dealerData/{uid} {
@@ -40,7 +52,8 @@ service cloud.firestore {
       allow create: if isEmployee()
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.enteredBy == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.name
-        && request.resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route
+        && request.resource.data.areaName == get(/databases/$(database)/documents/employeeProfiles/$(request.auth.uid)).data.areaName
+        && request.resource.data.route in get(/databases/$(database)/documents/employeeProfiles/$(request.auth.uid)).data.routes
         && request.resource.data.status == 'Pending Admin Approval';
       allow read: if isAdmin()
         || (isEmployee() && resource.data.createdBy == request.auth.uid);
@@ -59,7 +72,8 @@ service cloud.firestore {
         && request.resource.data.items.size() <= 100
         && request.resource.data.employee == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.name
         && request.resource.data.employeeId == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.employeeId
-        && request.resource.data.route == get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.route);
+        && request.resource.data.areaName == get(/databases/$(database)/documents/employeeProfiles/$(request.auth.uid)).data.areaName
+        && request.resource.data.route in get(/databases/$(database)/documents/employeeProfiles/$(request.auth.uid)).data.routes);
       allow read: if isAdmin()
         || (isEmployee() && resource.data.createdBy == request.auth.uid);
       allow update, delete: if isAdmin();
